@@ -1,16 +1,37 @@
-## Hi there 👋
+# Water Refilling Station Management System
 
-<!--
-**BoyPresoGang/BoyPresoGang** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## Project Overview
+The Water Refilling Station Management System is designed to help manage customer orders, product inventory, and delivery records efficiently. The system aims to replace manual record-keeping with a digital database that improves accuracy and organization.
 
-Here are some ideas to get you started:
+## Problem It Solves
+Many water refilling stations still rely on handwritten records to manage customer orders and deliveries. This can result in:
+- Lost or incomplete records
+- Difficulty tracking deliveries
+- Errors in customer orders
+- Inefficient inventory management
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+This system provides a centralized way to record and monitor daily operations.
+
+## Main Record Types
+- Customers
+- Orders
+- Deliveries
+- Products
+
+## Objectives
+- Maintain customer information.
+- Record and monitor customer orders.
+- Track delivery schedules and statuses.
+- Manage available products and inventory.
+
+## Team Members
+| Name | Role |
+|------|------|
+| Angel Mark Sumampong Cabalgada | Repo Lead |
+| Abdul Cedick Khalid Kalaw | Board Lead |
+| Rommel John Macas Agolito | Scribe |
+| Christian Jay Lord Alsa Pedere | Builder |
+| Jerfrans Dotdot Guerbo | Builder |
+
+## Repository
+This repository contains the source code, documentation, and project files for the Water Refilling Station Management System.

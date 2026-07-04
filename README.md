@@ -1,7 +1,9 @@
 # Water Refilling Station Management System
 
+A database-driven system for managing customer records, orders, deliveries, and inventory for a water refilling station.
+
 ## Project Overview
-The Water Refilling Station Management System is designed to help manage customer orders, product inventory, and delivery records efficiently. The system aims to replace manual record-keeping with a digital database that improves accuracy and organization.
+The Water Refilling Station Management System is designed to help manage customer orders, product inventory, and delivery records efficiently. The system replaces manual record-keeping with a digital database to improve accuracy, organization, and operational efficiency.
 
 ## Problem It Solves
 Many water refilling stations still rely on handwritten records to manage customer orders and deliveries. This can result in:
@@ -24,7 +26,8 @@ This system provides a centralized way to record and monitor daily operations.
 - Track delivery schedules and statuses.
 - Manage available products and inventory.
 
-## Team Members
+## Team Roster
+
 | Name | Role |
 |------|------|
 | Angel Mark Sumampong Cabalgada | Repo Lead |

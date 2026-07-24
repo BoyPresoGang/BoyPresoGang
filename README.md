@@ -8,6 +8,17 @@ The Water Refilling Station Management System is designed for local water refill
 ## Problem Statement
 Many local water refilling stations still rely on handwritten logs or manual record-keeping to manage customer information, product inventory, orders, and deliveries. These manual processes can lead to lost or incomplete records, inaccurate inventory tracking, delayed deliveries, and errors in customer orders. This project aims to provide a centralized database system that allows staff to efficiently create, view, update, and delete records while improving the accuracy and organization of daily business operations.
 
+## CRUD Operations
+
+The Water Refilling Station Management System supports the following Create, Read, Update, and Delete (CRUD) operations for each primary record type.
+
+| Record Type | Create | Read | Update | Delete |
+|-------------|:------:|:----:|:------:|:------:|
+| Customers | Add new customer records | View customer list and details | Edit customer information | Remove customer records |
+| Products | Add new products | View product list and details | Update product information | Remove products from inventory |
+| Orders | Record new customer orders | View order list and details | Modify existing orders | Cancel or delete orders |
+| Deliveries | Schedule new deliveries | View delivery list and details | Update delivery status and schedule | Remove delivery records |
+
 ## Main Record Types
 - Customers
 - Products

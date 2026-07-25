@@ -35,3 +35,41 @@
 - Loading State
 - Success State
 - Error State
+
+---
+
+# Orders
+
+## Screens
+
+- Order List
+- Order Details
+- Create Order
+- Edit Order
+- Delete Confirmation
+
+## States
+
+- Empty State
+- Loading State
+- Success State
+- Error State
+
+---
+
+# Deliveries
+
+## Screens
+
+- Delivery List
+- Delivery Details
+- Create Delivery
+- Edit Delivery
+- Delete Confirmation
+
+## States
+
+- Empty State
+- Loading State
+- Success State
+- Error State

@@ -40,3 +40,14 @@ These features were excluded because they are outside the scope of Deliverable 1
 ## Final Decision
 
 The team adopted the AI-generated documentation as a starting point and reviewed it before adding it to the repository.
+
+## Scope Review
+
+### Prompt
+Is the project scope realistic for five students to complete in ten weeks? What features should be removed to avoid over-scoping?
+
+### AI Response (Summary)
+The AI suggested keeping the project focused on the core CRUD operations for Customers, Products, Orders, and Deliveries. Additional features such as user authentication, payment processing, dashboards, notifications, and advanced reporting were identified as unnecessary for the current project scope.
+
+### Team Decision
+The team decided to keep the scope limited to the core CRUD functionality and rejected additional features to ensure the project remains achievable within the allotted ten-week development period.

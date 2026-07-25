@@ -6,48 +6,68 @@
 
 ---
 
+## Purpose of AI Use
+
+The team used ChatGPT as a planning and documentation assistant during Deliverable 1. AI was used to brainstorm ideas, review the project scope, improve documentation, identify missing CRUD operations and screen states, and organize project artifacts. All AI-generated content was reviewed, verified, and finalized by the team before being included in the repository.
+
+---
+
 ## Prompts Used
 
 1. Generate CRUD user stories for a Water Refilling Station Management System.
-2. Generate acceptance criteria for CRUD user stories.
-3. Suggest screen states for Customers, Products, Orders, and Deliveries.
-4. Organize the project backlog into Markdown format.
-5. Generate documentation for the GitHub Project Board.
+2. Generate specific and testable acceptance criteria for each CRUD user story.
+3. Identify missing CRUD operations and screen states.
+4. Generate screen and state documentation for Customers, Products, Orders, and Deliveries.
+5. Suggest improvements to keep the project scope realistic for five students over ten weeks.
+6. Organize the project backlog into Markdown format.
+7. Generate documentation for the GitHub Project Board.
+8. Review the repository documentation for missing requirements.
 
 ---
 
 ## AI Suggestions Accepted
 
-- CRUD user stories
-- Acceptance criteria
-- Screen organization
-- Documentation structure
-- Markdown formatting
+The team accepted the following suggestions after reviewing them:
+
+- Generated CRUD user stories for Customers, Products, Orders, and Deliveries.
+- Improved acceptance criteria by making them more specific and testable.
+- Suggested missing screen states, including Empty State, Error State, and Delete Confirmation.
+- Organized the project backlog into Markdown format.
+- Generated documentation structure for the GitHub Project Board.
+- Reviewed the project scope and confirmed that it was appropriate for Deliverable 1.
+- Improved the organization and formatting of project documentation.
 
 ---
 
 ## AI Suggestions Rejected
 
-- Advanced user roles (Admin/Staff separation)
-- Payment processing module
-- Analytics dashboard
-- SMS notification features
+The following AI suggestions were intentionally excluded because they would increase the project scope beyond the requirements of Deliverable 1:
 
-These features were excluded because they are outside the scope of Deliverable 1.
+- User authentication and login system
+- Admin and Staff role management
+- Payment processing
+- SMS or email notifications
+- Dashboard analytics and reports
+- Advanced search and filtering features
+
+---
+
+## Scope Review
+
+### Prompt
+
+Is the project scope realistic for five students to complete in ten weeks? What features should be removed to avoid over-scoping?
+
+### AI Response (Summary)
+
+The AI reviewed the project backlog and determined that the planned CRUD modules for Customers, Products, Orders, and Deliveries were realistic for a five-member team within a ten-week schedule. It recommended keeping the project focused on the core CRUD functionality and avoiding additional features such as authentication, dashboards, payment processing, notifications, and analytics because these would significantly increase development time.
+
+### Team Decision
+
+The team decided to keep the project focused on the four core CRUD modules only. Additional features suggested by the AI that would increase the project scope were not included. During the review, the team also identified missing Empty State and Error State screens and added them to complete the screen and state documentation required for Deliverable 1.
 
 ---
 
 ## Final Decision
 
-The team adopted the AI-generated documentation as a starting point and reviewed it before adding it to the repository.
-
-## Scope Review
-
-### Prompt
-Is the project scope realistic for five students to complete in ten weeks? What features should be removed to avoid over-scoping?
-
-### AI Response (Summary)
-The AI suggested keeping the project focused on the core CRUD operations for Customers, Products, Orders, and Deliveries. Additional features such as user authentication, payment processing, dashboards, notifications, and advanced reporting were identified as unnecessary for the current project scope.
-
-### Team Decision
-The team decided to keep the scope limited to the core CRUD functionality and rejected additional features to ensure the project remains achievable within the allotted ten-week development period.
+The team used ChatGPT as a planning and documentation assistant throughout Deliverable 1. AI-assisted outputs were treated as draft material and were reviewed, edited, and approved by the team before being committed to the repository. The final repository reflects the team's decisions regarding project scope, backlog organization, acceptance criteria, screen states, and documentation.

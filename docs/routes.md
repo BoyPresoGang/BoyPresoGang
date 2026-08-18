@@ -19,3 +19,14 @@
 | `POST` | `/products` | `createProduct` | P1 – Create Product |
 | `GET` | `/products` | `listProducts` | P2 – View Product List |
 | `GET` | `/products/:id` | `showProduct` | P3 – View Product Details |
+| `PUT` | `/products/:id` | `updateProduct` | P4 – Update Product |
+| `DELETE` | `/products/:id` | `deleteProduct` | P5 – Delete Product |
+
+---
+
+## Orders
+
+| Method | Path | Handler | Story it serves |
+|---|---|---|---|
+| `POST` | `/orders` | `createOrder` | O1 – Create Order |
+| `GET` | `/orders` | `listOrders` | O2 – View Order List |

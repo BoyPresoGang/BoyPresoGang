@@ -30,3 +30,14 @@
 |---|---|---|---|
 | `POST` | `/orders` | `createOrder` | O1 – Create Order |
 | `GET` | `/orders` | `listOrders` | O2 – View Order List |
+| `GET` | `/orders/:id` | `showOrder` | O3 – View Order Details |
+| `PUT` | `/orders/:id` | `updateOrder` | O4 – Update Order |
+| `DELETE` | `/orders/:id` | `deleteOrder` | O5 – Delete Order |
+
+---
+
+## Deliveries
+
+| Method | Path | Handler | Story it serves |
+|---|---|---|---|
+| `POST` | `/deliveries` | `createDelivery` | D1 – Create Delivery |

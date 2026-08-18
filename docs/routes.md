@@ -41,3 +41,7 @@
 | Method | Path | Handler | Story it serves |
 |---|---|---|---|
 | `POST` | `/deliveries` | `createDelivery` | D1 – Create Delivery |
+| `GET` | `/deliveries` | `listDeliveries` | D2 – View Delivery List |
+| `GET` | `/deliveries/:id` | `showDelivery` | D3 – View Delivery Details |
+| `PUT` | `/deliveries/:id` | `updateDelivery` | D4 – Update Delivery |
+| `DELETE` | `/deliveries/:id` | `deleteDelivery` | D5 – Delete Delivery |

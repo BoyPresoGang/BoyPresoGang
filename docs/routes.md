@@ -157,3 +157,10 @@
   * **Request:** `DELETE http://127.0.0.1:8000/api/deliveries/1`
   * **Status:** `200 OK`
   * **Response Body:** `{"message": "deleteDelivery stub", "id": "1"}`
+
+### Error Handling & Edge Cases
+
+* **Wrong Method / Missing Parameter:**
+  * **Request:** `DELETE http://127.0.0.1:8000/api/orders` *(Missing required `:id` parameter)*
+  * **Status:** `405 Method Not Allowed`
+  * **Behavior:** Sensibly rejected by Laravel router due to missing route parameters and mismatched HTTP verb.

@@ -130,3 +130,30 @@
   * **Request:** `DELETE http://127.0.0.1:8000/api/orders/1`
   * **Status:** `200 OK`
   * **Response Body:** `{"message": "deleteOrder stub", "id": "1"}`
+
+### Deliveries Test Results
+
+* **D1 – Create Delivery**
+  * **Request:** `POST http://127.0.0.1:8000/api/deliveries`
+  * **Status:** `201 Created`
+  * **Response Body:** `{"message": "createDelivery stub"}`
+
+* **D2 – View Delivery List**
+  * **Request:** `GET http://127.0.0.1:8000/api/deliveries`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "listDeliveries stub"}`
+
+* **D3 – View Delivery Details**
+  * **Request:** `GET http://127.0.0.1:8000/api/deliveries/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "showDelivery stub", "id": "1"}`
+
+* **D4 – Update Delivery**
+  * **Request:** `PUT http://127.0.0.1:8000/api/deliveries/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "updateDelivery stub", "id": "1"}`
+
+* **D5 – Delete Delivery**
+  * **Request:** `DELETE http://127.0.0.1:8000/api/deliveries/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "deleteDelivery stub", "id": "1"}`

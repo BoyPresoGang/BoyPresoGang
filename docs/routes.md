@@ -76,3 +76,30 @@
   * **Request:** `DELETE http://127.0.0.1:8000/api/customers/1`
   * **Status:** `200 OK`
   * **Response Body:** `{"message": "deleteCustomer stub", "id": "1"}`
+
+### Products Test Results
+
+* **P1 – Create Product**
+  * **Request:** `POST http://127.0.0.1:8000/api/products`
+  * **Status:** `201 Created`
+  * **Response Body:** `{"message": "createProduct stub"}`
+
+* **P2 – View Product List**
+  * **Request:** `GET http://127.0.0.1:8000/api/products`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "listProducts stub"}`
+
+* **P3 – View Product Details**
+  * **Request:** `GET http://127.0.0.1:8000/api/products/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "showProduct stub", "id": "1"}`
+
+* **P4 – Update Product**
+  * **Request:** `PUT http://127.0.0.1:8000/api/products/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "updateProduct stub", "id": "1"}`
+
+* **P5 – Delete Product**
+  * **Request:** `DELETE http://127.0.0.1:8000/api/products/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "deleteProduct stub", "id": "1"}`

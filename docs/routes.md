@@ -103,3 +103,30 @@
   * **Request:** `DELETE http://127.0.0.1:8000/api/products/1`
   * **Status:** `200 OK`
   * **Response Body:** `{"message": "deleteProduct stub", "id": "1"}`
+
+### Orders Test Results
+
+* **O1 – Create Order**
+  * **Request:** `POST http://127.0.0.1:8000/api/orders`
+  * **Status:** `201 Created`
+  * **Response Body:** `{"message": "createOrder stub"}`
+
+* **O2 – View Order List**
+  * **Request:** `GET http://127.0.0.1:8000/api/orders`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "listOrders stub"}`
+
+* **O3 – View Order Details**
+  * **Request:** `GET http://127.0.0.1:8000/api/orders/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "showOrder stub", "id": "1"}`
+
+* **O4 – Update Order**
+  * **Request:** `PUT http://127.0.0.1:8000/api/orders/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "updateOrder stub", "id": "1"}`
+
+* **O5 – Delete Order**
+  * **Request:** `DELETE http://127.0.0.1:8000/api/orders/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "deleteOrder stub", "id": "1"}`

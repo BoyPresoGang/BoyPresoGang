@@ -1,5 +1,7 @@
 # API Routes
 
+## 1. Route Definitions
+
 ## Customers
 
 | Method | Path | Handler | Story it serves |
@@ -45,3 +47,32 @@
 | `GET` | `/deliveries/:id` | `showDelivery` | D3 – View Delivery Details |
 | `PUT` | `/deliveries/:id` | `updateDelivery` | D4 – Update Delivery |
 | `DELETE` | `/deliveries/:id` | `deleteDelivery` | D5 – Delete Delivery |
+
+## 2. Test Execution Logs
+
+### Customers Test Results
+
+* **C1 – Create Customer**
+  * **Request:** `POST http://127.0.0.1:8000/api/customers`
+  * **Status:** `201 Created`
+  * **Response Body:** `{"message": "createCustomer stub"}`
+
+* **C2 – View Customer List**
+  * **Request:** `GET http://127.0.0.1:8000/api/customers`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "listCustomers stub"}`
+
+* **C3 – View Customer Details**
+  * **Request:** `GET http://127.0.0.1:8000/api/customers/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "showCustomer stub", "id": "1"}`
+
+* **C4 – Update Customer**
+  * **Request:** `PUT http://127.0.0.1:8000/api/customers/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "updateCustomer stub", "id": "1"}`
+
+* **C5 – Delete Customer**
+  * **Request:** `DELETE http://127.0.0.1:8000/api/customers/1`
+  * **Status:** `200 OK`
+  * **Response Body:** `{"message": "deleteCustomer stub", "id": "1"}`

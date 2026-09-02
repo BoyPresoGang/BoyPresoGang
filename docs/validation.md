@@ -18,3 +18,9 @@
 | PUT /orders | customer_id | sometimes, integer, referential (exists in customers) |
 | PUT /orders | product_id | sometimes, integer, referential (exists in products) |
 | PUT /orders | quantity | sometimes, integer, 1 or greater |
+| POST /deliveries | customer_id | required, integer, referential (exists in customers) |
+| POST /deliveries | delivery_date | required, date, format YYYY-MM-DD |
+| POST /deliveries | status | required, one of (scheduled, in_transit, delivered, cancelled) |
+| PUT /deliveries | customer_id | sometimes, integer, referential (exists in customers) |
+| PUT /deliveries | delivery_date | sometimes, date, format YYYY-MM-DD |
+| PUT /deliveries | status | sometimes, one of (scheduled, in_transit, delivered, cancelled) |

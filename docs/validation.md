@@ -12,3 +12,9 @@
 | PUT /products | name | sometimes, string, 2-150 chars |
 | PUT /products | price | sometimes, number, greater than 0 |
 | PUT /products | stock | sometimes, integer, 0 or greater |
+| POST /orders | customer_id | required, integer, referential (exists in customers) |
+| POST /orders | product_id | required, integer, referential (exists in products) |
+| POST /orders | quantity | required, integer, 1 or greater |
+| PUT /orders | customer_id | sometimes, integer, referential (exists in customers) |
+| PUT /orders | product_id | sometimes, integer, referential (exists in products) |
+| PUT /orders | quantity | sometimes, integer, 1 or greater |

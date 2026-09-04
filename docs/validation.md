@@ -65,3 +65,25 @@
 | :--- | :--- | :--- | :--- |
 | Invalid Status | `{"status": "shipped"}` | 422 | 422 |
 | Non-Dispatcher | Header `X-User-Role: driver` | 403 | 403 |
+
+## Global System Breakdown & Edge Case Audit (Task 3, 4, & 5)
+
+### Standardized Error Shape
+All application errors strictly adhere to the unified format:
+
+```json
+{
+  "status": 422,
+  "error": "Human-readable error message",
+  "field": "<field_name>"
+}
+```
+
+### Edge Case Attack Matrix (Attempted Breakages)
+| Module | Bad Action / Input | Handled Code | Server Crashed (500)? |
+| :--- | :--- | :--- | :--- |
+| Customers | String length overflow (> 100 chars) | `422` | **No** |
+| Products | Type mismatch (`price: "cake"`) | `422` | **No** |
+| Orders | Negative range (`quantity: -5`) | `422` | **No** |
+| Deliveries | Unauthorized role deletion | `403` | **No** |
+| Global | Empty JSON Body `{}` | `422` | **No** |

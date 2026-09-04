@@ -42,5 +42,16 @@ The Water Refilling Station Management System supports the following Create, Rea
 | Christian Jay Lord Alsa Pedere | Builder |
 | Jerfrans Dotdot Guerbo | Builder |
 
+## Automated Testing & Suite Verification
+
+The project includes custom, automated feature tests following the Arrange-Act-Assert (AAA) pattern to verify thin controllers, standardized JSON response envelopes, validation guard clauses, and authorization status codes.
+
+### Running the Test Suite
+
+To run all team-written automated tests across all modules, execute the following command in your terminal:
+
+```bash
+php artisan test
+
 ## Repository
 This repository contains the source code, documentation, and other project files for the Water Refilling Station Management System.

@@ -41,3 +41,9 @@
 | PUT /deliveries | customer_id | sometimes, integer, referential (exists in customers) |
 | PUT /deliveries | delivery_date | sometimes, date, format YYYY-MM-DD |
 | PUT /deliveries | status | sometimes, one of (scheduled, in_transit, delivered, cancelled) |
+
+### Customers Testing Log
+| Test Case | Payload / Header | Expected | Result |
+| :--- | :--- | :--- | :--- |
+| Missing Name | `{}` | 422 | 422 |
+| Non-Admin Delete | Header `X-User-Role: user` | 403 | 403 |

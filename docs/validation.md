@@ -53,3 +53,9 @@
 | :--- | :--- | :--- | :--- |
 | Price as String | `{"price": "cake"}` | 422 | 422 |
 | Non-Manager Edit | Header `X-User-Role: clerk` | 403 | 403 |
+
+### Orders Testing Log
+| Test Case | Payload / Header | Expected | Result |
+| :--- | :--- | :--- | :--- |
+| Zero Quantity | `{"quantity": 0}` | 422 | 422 |
+| Unauthorized Edit | Header `X-User-Id: 200` | 403 | 403 |

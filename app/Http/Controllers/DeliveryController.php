@@ -2,69 +2,111 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Delivery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller
 {
+    protected const ALLOWED_STATUSES = ['scheduled', 'in_transit', 'delivered', 'cancelled'];
+
+    /**
+     * Shared validation rules, reused across create/update.
+     */
+    protected function rules(bool $isUpdate = false): array
+    {
+        $required = $isUpdate ? 'sometimes' : 'required';
+        $statuses = implode(',', self::ALLOWED_STATUSES);
+
+        return [
+            'customer_id' => "{$required}|integer",
+            'delivery_date' => "{$required}|date",
+            'status' => "{$required}|in:{$statuses}",
+        ];
+    }
+
+    /**
+     * Run validation and return a standardized error response if it fails.
+     */
+    protected function validateOrFail(Request $request, bool $isUpdate = false)
+    {
+        $validator = Validator::make($request->all(), $this->rules($isUpdate));
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $field = array_key_first($errors->toArray());
+
+            return response()->json([
+                'status' => 422,
+                'error' => $errors->first($field),
+                'field' => $field,
+            ], 422);
+        }
+
+        return $validator->validated();
+    }
+
     public function createDelivery(Request $request)
     {
-        $allowedStatuses = ['scheduled', 'in_transit', 'delivered', 'cancelled'];
+        $result = $this->validateOrFail($request);
 
-        // Guard Clauses (Task 2 & 3)
-        if (!$request->has('customer_id') || !is_numeric($request->input('customer_id'))) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'customer_id is required and must be an integer',
-                'field' => 'customer_id'
-            ], 422);
+        if ($result instanceof \Illuminate\Http\JsonResponse) {
+            return $result; // validation failed
         }
 
-        if (!$request->has('delivery_date') || empty($request->input('delivery_date'))) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'delivery_date is required',
-                'field' => 'delivery_date'
-            ], 422);
-        }
+        $delivery = Delivery::create($result);
 
-        if (!$request->has('status') || !in_array($request->input('status'), $allowedStatuses)) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'status must be one of: scheduled, in_transit, delivered, cancelled',
-                'field' => 'status'
-            ], 422);
-        }
+        return response()->json([
+            'status' => 201,
+            'data' => $delivery,
+        ], 201);
+    }
 
-        return response()->json(['message' => 'Delivery created successfully'], 201);
+    public function showDelivery($id)
+    {
+        $delivery = Delivery::findOrFail($id);
+
+        return response()->json([
+            'status' => 200,
+            'data' => $delivery,
+        ], 200);
     }
 
     public function updateDelivery(Request $request, $id)
     {
-        $allowedStatuses = ['scheduled', 'in_transit', 'delivered', 'cancelled'];
+        $delivery = Delivery::findOrFail($id);
 
-        // Guard Clauses
-        if ($request->has('status') && !in_array($request->input('status'), $allowedStatuses)) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'status must be one of: scheduled, in_transit, delivered, cancelled',
-                'field' => 'status'
-            ], 422);
+        $result = $this->validateOrFail($request, isUpdate: true);
+
+        if ($result instanceof \Illuminate\Http\JsonResponse) {
+            return $result; // validation failed
         }
 
-        return response()->json(['message' => 'Delivery updated successfully', 'id' => $id], 200);
+        $delivery->update($result);
+
+        return response()->json([
+            'status' => 200,
+            'data' => $delivery,
+        ], 200);
     }
 
-    // Task 4: Sensitive Action Guard (Cancel Delivery Authorization)
-    public function cancelDelivery(Request $request, $id)
+    public function deleteDelivery(Request $request, $id)
     {
         if ($request->header('X-User-Role') !== 'dispatcher') {
             return response()->json([
                 'status' => 403,
                 'error' => 'Forbidden: Only dispatchers can cancel deliveries',
-                'field' => 'authorization'
+                'field' => 'authorization',
             ], 403);
         }
 
-        return response()->json(['message' => 'Delivery status updated to cancelled', 'id' => $id], 200);
+        $delivery = Delivery::findOrFail($id);
+        $delivery->update(['status' => 'cancelled']);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Delivery status updated to cancelled',
+            'data' => $delivery,
+        ], 200);
     }
 }

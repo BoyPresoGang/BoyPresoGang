@@ -59,3 +59,9 @@
 | :--- | :--- | :--- | :--- |
 | Zero Quantity | `{"quantity": 0}` | 422 | 422 |
 | Unauthorized Edit | Header `X-User-Id: 200` | 403 | 403 |
+
+### Deliveries Testing Log
+| Test Case | Payload / Header | Expected | Result |
+| :--- | :--- | :--- | :--- |
+| Invalid Status | `{"status": "shipped"}` | 422 | 422 |
+| Non-Dispatcher | Header `X-User-Role: driver` | 403 | 403 |

@@ -2,89 +2,108 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
+    /**
+     * Shared validation rules, reused across create/update.
+     */
+    protected function rules(bool $isUpdate = false): array
+    {
+        $required = $isUpdate ? 'sometimes' : 'required';
+
+        return [
+            'name' => "{$required}|string|min:2|max:150",
+            'price' => "{$required}|numeric|gt:0",
+            'stock' => "{$required}|integer|gte:0",
+        ];
+    }
+
+    /**
+     * Run validation and return a standardized error response if it fails.
+     */
+    protected function validateOrFail(Request $request, bool $isUpdate = false)
+    {
+        $validator = Validator::make($request->all(), $this->rules($isUpdate));
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $field = array_key_first($errors->toArray());
+
+            return response()->json([
+                'status' => 422,
+                'error' => $errors->first($field),
+                'field' => $field,
+            ], 422);
+        }
+
+        return $validator->validated();
+    }
+
     public function createProduct(Request $request)
     {
-        // Guard Clauses (Task 2 & 3)
-        if (!$request->has('name') || empty(trim($request->input('name')))) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'Product name is required',
-                'field' => 'name'
-            ], 422);
+        $result = $this->validateOrFail($request);
+
+        if ($result instanceof \Illuminate\Http\JsonResponse) {
+            return $result; // validation failed
         }
 
-        if (strlen($request->input('name')) < 2 || strlen($request->input('name')) > 150) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'Product name must be between 2 and 150 characters',
-                'field' => 'name'
-            ], 422);
-        }
+        $product = Product::create($result);
 
-        if (!$request->has('price') || !is_numeric($request->input('price')) || $request->input('price') <= 0) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'Price must be a number greater than 0',
-                'field' => 'price'
-            ], 422);
-        }
+        return response()->json([
+            'status' => 201,
+            'data' => $product,
+        ], 201);
+    }
 
-        if (!$request->has('stock') || !is_numeric($request->input('stock')) || $request->input('stock') < 0) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'Stock must be an integer 0 or greater',
-                'field' => 'stock'
-            ], 422);
-        }
+    public function showProduct($id)
+    {
+        $product = Product::findOrFail($id);
 
-        return response()->json(['message' => 'Product created successfully'], 201);
+        return response()->json([
+            'status' => 200,
+            'data' => $product,
+        ], 200);
     }
 
     public function updateProduct(Request $request, $id)
     {
-        // Guard Clauses
-        if ($request->has('name') && (strlen($request->input('name')) < 2 || strlen($request->input('name')) > 150)) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'Product name must be between 2 and 150 characters',
-                'field' => 'name'
-            ], 422);
+        $product = Product::findOrFail($id);
+
+        $result = $this->validateOrFail($request, isUpdate: true);
+
+        if ($result instanceof \Illuminate\Http\JsonResponse) {
+            return $result; // validation failed
         }
 
-        if ($request->has('price') && (!is_numeric($request->input('price')) || $request->input('price') <= 0)) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'Price must be a number greater than 0',
-                'field' => 'price'
-            ], 422);
-        }
+        $product->update($result);
 
-        if ($request->has('stock') && (!is_numeric($request->input('stock')) || $request->input('stock') < 0)) {
-            return response()->json([
-                'status' => 422,
-                'error' => 'Stock must be an integer 0 or greater',
-                'field' => 'stock'
-            ], 422);
-        }
-
-        return response()->json(['message' => 'Product updated successfully', 'id' => $id], 200);
+        return response()->json([
+            'status' => 200,
+            'data' => $product,
+        ], 200);
     }
 
-    // Task 4: Sensitive Action Guard (Delete Product)
     public function deleteProduct(Request $request, $id)
     {
         if ($request->header('X-User-Role') !== 'manager') {
             return response()->json([
                 'status' => 403,
                 'error' => 'Forbidden: Only managers can delete products',
-                'field' => 'authorization'
+                'field' => 'authorization',
             ], 403);
         }
 
-        return response()->json(['message' => 'Product deleted successfully', 'id' => $id], 200);
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Product deleted successfully',
+            'id' => $id,
+        ], 200);
     }
 }

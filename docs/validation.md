@@ -47,3 +47,9 @@
 | :--- | :--- | :--- | :--- |
 | Missing Name | `{}` | 422 | 422 |
 | Non-Admin Delete | Header `X-User-Role: user` | 403 | 403 |
+
+### Products Testing Log
+| Test Case | Payload / Header | Expected | Result |
+| :--- | :--- | :--- | :--- |
+| Price as String | `{"price": "cake"}` | 422 | 422 |
+| Non-Manager Edit | Header `X-User-Role: clerk` | 403 | 403 |

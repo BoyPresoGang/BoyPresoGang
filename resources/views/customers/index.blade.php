@@ -76,6 +76,26 @@
             margin-right: 10px;
             color: #212529;
         }
+                .state-message {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .state-message h2 {
+            margin-top: 0;
+        }
+
+        .state-message p {
+            color: #6c757d;
+        }
+
+        .error-state {
+            border-color: #dc3545;
+        }
     </style>
 </head>
 
@@ -93,6 +113,28 @@
             <a href="#" class="button">Add Customer</a>
         </header>
 
+        <section class="table-container" aria-label="Customer list">
+                   {{-- Empty State --}}
+        <section class="state-message" aria-label="Empty customer list">
+            <h2>No customers yet</h2>
+            <p>There are currently no customers registered in the system.</p>
+            <a href="#" class="button">Add Customer</a>
+        </section>
+
+        {{-- Loading State --}}
+        <section class="state-message" aria-label="Loading customer list">
+            <h2>Loading customers...</h2>
+            <p>Please wait while the customer records are being loaded.</p>
+        </section>
+
+        {{-- Error State --}}
+        <section class="state-message error-state" aria-label="Customer list error">
+            <h2>Unable to load customers</h2>
+            <p>Something went wrong while loading the customer records. Please try again.</p>
+            <a href="#" class="button">Try Again</a>
+        </section>
+
+        {{-- Customer List --}}
         <section class="table-container" aria-label="Customer list">
             <table>
                 <thead>

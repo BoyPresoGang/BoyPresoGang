@@ -76,6 +76,26 @@
             margin-right: 10px;
             color: #212529;
         }
+                .state-message {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .state-message h2 {
+            margin-top: 0;
+        }
+
+        .state-message p {
+            color: #6c757d;
+        }
+
+        .error-state {
+            border-color: #dc3545;
+        }
     </style>
 </head>
 
@@ -93,6 +113,28 @@
             <a href="#" class="button">Create Order</a>
         </header>
 
+        <section class="table-container" aria-label="Order list">
+                    {{-- Empty State --}}
+        <section class="state-message" aria-label="Empty order list">
+            <h2>No orders yet</h2>
+            <p>There are currently no orders registered in the system.</p>
+            <a href="#" class="button">Create Order</a>
+        </section>
+
+        {{-- Loading State --}}
+        <section class="state-message" aria-label="Loading order list">
+            <h2>Loading orders...</h2>
+            <p>Please wait while the order records are being loaded.</p>
+        </section>
+
+        {{-- Error State --}}
+        <section class="state-message error-state" aria-label="Order list error">
+            <h2>Unable to load orders</h2>
+            <p>Something went wrong while loading the order records. Please try again.</p>
+            <a href="#" class="button">Try Again</a>
+        </section>
+
+        {{-- Order List --}}
         <section class="table-container" aria-label="Order list">
             <table>
                 <thead>

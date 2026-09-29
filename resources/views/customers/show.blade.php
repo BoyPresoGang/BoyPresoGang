@@ -71,6 +71,26 @@
         .secondary-button {
             background: #6c757d;
         }
+                .state-message {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .state-message h2 {
+            margin-top: 0;
+        }
+
+        .state-message p {
+            color: #6c757d;
+        }
+
+        .error-state {
+            border-color: #dc3545;
+        }
     </style>
 </head>
 
@@ -83,7 +103,26 @@
                 View the complete information for this customer.
             </p>
         </header>
+                {{-- Empty State --}}
+        <section class="state-message" aria-label="Customer not found">
+            <h2>Customer not found</h2>
+            <p>The requested customer record does not exist.</p>
+            <a href="#" class="button secondary-button">Back to Customers</a>
+        </section>
 
+        {{-- Loading State --}}
+        <section class="state-message" aria-label="Loading customer details">
+            <h2>Loading customer details...</h2>
+            <p>Please wait while the customer information is being loaded.</p>
+        </section>
+
+        {{-- Error State --}}
+        <section class="state-message error-state" aria-label="Customer details error">
+            <h2>Unable to load customer</h2>
+            <p>Something went wrong while loading this customer's information.</p>
+            <a href="#" class="button">Try Again</a>
+        </section>
+        
         <section class="card" aria-label="Customer details">
 
             <div class="detail-row">

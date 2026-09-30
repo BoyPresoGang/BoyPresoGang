@@ -49,6 +49,16 @@
             font-weight: 600;
         }
 
+        .required {
+            color: #b02a37;
+        }
+
+        .form-note {
+            margin-bottom: 20px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
         input,
         select {
             width: 100%;
@@ -58,6 +68,12 @@
             border-radius: 6px;
             font-size: 16px;
             background: white;
+        }
+
+        input:focus,
+        select:focus {
+            outline: 3px solid rgba(13, 110, 253, 0.25);
+            border-color: #0d6efd;
         }
 
         .actions {
@@ -74,6 +90,11 @@
             border-radius: 6px;
             cursor: pointer;
             margin-right: 8px;
+        }
+
+        .button:focus {
+            outline: 3px solid rgba(13, 110, 253, 0.25);
+            outline-offset: 2px;
         }
 
         .secondary-button {
@@ -96,30 +117,47 @@
 
             <form action="#" method="POST">
 
+                <p class="form-note">
+                    <span class="required">*</span> Required fields
+                </p>
+
                 <div class="form-group">
-                    <label for="customer">Customer</label>
-                    <select id="customer" name="customer">
+                    <label for="customer">Customer <span class="required">*</span></label>
+                    <select
+                        id="customer"
+                        name="customer"
+                        required
+                        aria-required="true"
+                    >
                         <option value="1" selected>Juan Dela Cruz</option>
                         <option value="2">Maria Santos</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="product">Product</label>
-                    <select id="product" name="product">
+                    <label for="product">Product <span class="required">*</span></label>
+                    <select
+                        id="product"
+                        name="product"
+                        required
+                        aria-required="true"
+                    >
                         <option value="1" selected>5-Gallon Purified Water</option>
                         <option value="2">5-Gallon Mineral Water</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="quantity">Quantity</label>
+                    <label for="quantity">Quantity <span class="required">*</span></label>
                     <input
                         type="number"
                         id="quantity"
                         name="quantity"
                         min="1"
+                        step="1"
                         value="3"
+                        required
+                        aria-required="true"
                     >
                 </div>
 

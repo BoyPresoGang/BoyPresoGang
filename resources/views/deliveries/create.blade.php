@@ -49,6 +49,16 @@
             font-weight: 600;
         }
 
+        .required {
+            color: #b02a37;
+        }
+
+        .form-note {
+            margin-bottom: 20px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
         input,
         select,
         textarea {
@@ -66,6 +76,13 @@
             resize: vertical;
         }
 
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: 3px solid rgba(13, 110, 253, 0.25);
+            border-color: #0d6efd;
+        }
+
         .actions {
             margin-top: 24px;
         }
@@ -80,6 +97,11 @@
             border-radius: 6px;
             cursor: pointer;
             margin-right: 8px;
+        }
+
+        .button:focus {
+            outline: 3px solid rgba(13, 110, 253, 0.25);
+            outline-offset: 2px;
         }
 
         .secondary-button {
@@ -102,9 +124,18 @@
 
             <form action="#" method="POST">
 
+                <p class="form-note">
+                    <span class="required">*</span> Required fields
+                </p>
+
                 <div class="form-group">
-                    <label for="order">Order</label>
-                    <select id="order" name="order">
+                    <label for="order">Order <span class="required">*</span></label>
+                    <select
+                        id="order"
+                        name="order"
+                        required
+                        aria-required="true"
+                    >
                         <option value="">Select an order</option>
                         <option value="1001">#1001 - Juan Dela Cruz</option>
                         <option value="1002">#1002 - Maria Santos</option>
@@ -112,17 +143,25 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="address">Delivery Address</label>
+                    <label for="address">Delivery Address <span class="required">*</span></label>
                     <textarea
                         id="address"
                         name="address"
                         placeholder="Enter delivery address"
+                        autocomplete="street-address"
+                        required
+                        aria-required="true"
                     ></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="status">Delivery Status</label>
-                    <select id="status" name="status">
+                    <label for="status">Delivery Status <span class="required">*</span></label>
+                    <select
+                        id="status"
+                        name="status"
+                        required
+                        aria-required="true"
+                    >
                         <option value="">Select delivery status</option>
                         <option value="pending">Pending</option>
                         <option value="out_for_delivery">Out for Delivery</option>

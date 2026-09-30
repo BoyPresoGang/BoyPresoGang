@@ -49,6 +49,16 @@
             font-weight: 600;
         }
 
+        .required {
+            color: #b02a37;
+        }
+
+        .form-note {
+            margin-bottom: 20px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
         input,
         textarea {
             width: 100%;
@@ -62,6 +72,12 @@
         textarea {
             min-height: 100px;
             resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: 3px solid rgba(13, 110, 253, 0.25);
+            border-color: #0d6efd;
         }
 
         .actions {
@@ -78,6 +94,11 @@
             border-radius: 6px;
             cursor: pointer;
             margin-right: 8px;
+        }
+
+        .button:focus {
+            outline: 3px solid rgba(13, 110, 253, 0.25);
+            outline-offset: 2px;
         }
 
         .secondary-button {
@@ -100,32 +121,45 @@
 
             <form action="#" method="POST">
 
+                <p class="form-note">
+                    <span class="required">*</span> Required fields
+                </p>
+
                 <div class="form-group">
-                    <label for="name">Customer Name</label>
+                    <label for="name">Customer Name <span class="required">*</span></label>
                     <input
                         type="text"
                         id="name"
                         name="name"
                         placeholder="Enter customer name"
+                        autocomplete="name"
+                        required
+                        aria-required="true"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="contact_number">Contact Number</label>
+                    <label for="contact_number">Contact Number <span class="required">*</span></label>
                     <input
                         type="tel"
                         id="contact_number"
                         name="contact_number"
                         placeholder="Enter contact number"
+                        autocomplete="tel"
+                        required
+                        aria-required="true"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="address">Address</label>
+                    <label for="address">Address <span class="required">*</span></label>
                     <textarea
                         id="address"
                         name="address"
                         placeholder="Enter customer address"
+                        autocomplete="street-address"
+                        required
+                        aria-required="true"
                     ></textarea>
                 </div>
 

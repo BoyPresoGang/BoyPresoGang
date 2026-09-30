@@ -49,6 +49,16 @@
             font-weight: 600;
         }
 
+        .required {
+            color: #b02a37;
+        }
+
+        .form-note {
+            margin-bottom: 20px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
         input {
             width: 100%;
             box-sizing: border-box;
@@ -56,6 +66,11 @@
             border: 1px solid #ced4da;
             border-radius: 6px;
             font-size: 16px;
+        }
+
+        input:focus {
+            outline: 3px solid rgba(13, 110, 253, 0.25);
+            border-color: #0d6efd;
         }
 
         .actions {
@@ -72,6 +87,11 @@
             border-radius: 6px;
             cursor: pointer;
             margin-right: 8px;
+        }
+
+        .button:focus {
+            outline: 3px solid rgba(13, 110, 253, 0.25);
+            outline-offset: 2px;
         }
 
         .secondary-button {
@@ -94,18 +114,24 @@
 
             <form action="#" method="POST">
 
+                <p class="form-note">
+                    <span class="required">*</span> Required fields
+                </p>
+
                 <div class="form-group">
-                    <label for="name">Product Name</label>
+                    <label for="name">Product Name <span class="required">*</span></label>
                     <input
                         type="text"
                         id="name"
                         name="name"
                         value="5-Gallon Purified Water"
+                        required
+                        aria-required="true"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="price">Price</label>
+                    <label for="price">Price <span class="required">*</span></label>
                     <input
                         type="number"
                         id="price"
@@ -113,17 +139,22 @@
                         min="0"
                         step="0.01"
                         value="25.00"
+                        required
+                        aria-required="true"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="stock">Stock</label>
+                    <label for="stock">Stock <span class="required">*</span></label>
                     <input
                         type="number"
                         id="stock"
                         name="stock"
                         min="0"
+                        step="1"
                         value="50"
+                        required
+                        aria-required="true"
                     >
                 </div>
 

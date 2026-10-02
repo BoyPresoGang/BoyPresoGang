@@ -59,6 +59,32 @@
             font-size: 14px;
         }
 
+        .field-error {
+            display: block;
+            margin-top: 6px;
+            color: #b02a37;
+            font-size: 14px;
+        }
+
+        .form-message {
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .form-message.success {
+            display: block;
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .form-message.error {
+            display: block;
+            background: #f8d7da;
+            color: #842029;
+        }
+
         input {
             width: 100%;
             box-sizing: border-box;
@@ -71,6 +97,10 @@
         input:focus {
             outline: 3px solid rgba(13, 110, 253, 0.25);
             border-color: #0d6efd;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #b02a37;
         }
 
         .actions {
@@ -94,6 +124,11 @@
             outline-offset: 2px;
         }
 
+        .button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
         .secondary-button {
             background: #6c757d;
         }
@@ -112,40 +147,72 @@
 
         <section class="card" aria-label="Create product form">
 
-            <form action="#" method="POST">
+            <div
+                id="form-message"
+                class="form-message"
+                role="alert"
+                aria-live="polite"
+            ></div>
+
+            <form id="product-form" action="#" method="POST">
 
                 <p class="form-note">
                     <span class="required">*</span> Required fields
                 </p>
 
                 <div class="form-group">
-                    <label for="name">Product Name <span class="required">*</span></label>
+                    <label for="name">
+                        Product Name <span class="required">*</span>
+                    </label>
+
                     <input
                         type="text"
                         id="name"
                         name="name"
                         placeholder="Enter product name"
+                        minlength="2"
+                        maxlength="150"
                         required
                         aria-required="true"
+                        aria-describedby="name-error"
                     >
+
+                    <span
+                        id="name-error"
+                        class="field-error"
+                        aria-live="polite"
+                    ></span>
                 </div>
 
                 <div class="form-group">
-                    <label for="price">Price <span class="required">*</span></label>
+                    <label for="price">
+                        Price <span class="required">*</span>
+                    </label>
+
                     <input
                         type="number"
                         id="price"
                         name="price"
-                        min="0"
+                        min="0.01"
                         step="0.01"
                         placeholder="Enter product price"
                         required
                         aria-required="true"
+                        aria-describedby="price-error"
                     >
+
+                    <span
+                        id="price-error"
+                        class="field-error"
+                        aria-live="polite"
+                    ></span>
                 </div>
 
                 <div class="form-group">
-                    <label for="stock">Stock <span class="required">*</span></label>
+                    <label for="stock">
+                        Stock <span class="required">*</span>
+                    </label>
+
                     <input
                         type="number"
                         id="stock"
@@ -155,12 +222,28 @@
                         placeholder="Enter available stock"
                         required
                         aria-required="true"
+                        aria-describedby="stock-error"
                     >
+
+                    <span
+                        id="stock-error"
+                        class="field-error"
+                        aria-live="polite"
+                    ></span>
                 </div>
 
                 <div class="actions">
-                    <button type="submit" class="button">Save Product</button>
-                    <a href="#" class="button secondary-button">Cancel</a>
+                    <button
+                        type="submit"
+                        id="submit-button"
+                        class="button"
+                    >
+                        Save Product
+                    </button>
+
+                    <a href="#" class="button secondary-button">
+                        Cancel
+                    </a>
                 </div>
 
             </form>
@@ -168,5 +251,106 @@
         </section>
 
     </main>
+
+    <script>
+        const productForm = document.getElementById('product-form');
+        const submitButton = document.getElementById('submit-button');
+        const formMessage = document.getElementById('form-message');
+
+        const fieldIds = [
+            'name',
+            'price',
+            'stock'
+        ];
+
+        function clearMessages() {
+            formMessage.textContent = '';
+            formMessage.className = 'form-message';
+
+            fieldIds.forEach(function (fieldId) {
+                const input = document.getElementById(fieldId);
+                const error = document.getElementById(fieldId + '-error');
+
+                input.removeAttribute('aria-invalid');
+                error.textContent = '';
+            });
+        }
+
+        function showMessage(type, message) {
+            formMessage.textContent = message;
+            formMessage.className = 'form-message ' + type;
+        }
+
+        function showFieldError(fieldId, message) {
+            const input = document.getElementById(fieldId);
+            const error = document.getElementById(fieldId + '-error');
+
+            if (!input || !error) {
+                return;
+            }
+
+            input.setAttribute('aria-invalid', 'true');
+            error.textContent = message;
+        }
+
+        productForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            clearMessages();
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Saving...';
+
+            const data = {
+                name: document.getElementById('name').value.trim(),
+                price: Number(document.getElementById('price').value),
+                stock: Number(document.getElementById('stock').value)
+            };
+
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.status === 201) {
+                    showMessage(
+                        'success',
+                        'Product created successfully.'
+                    );
+
+                    productForm.reset();
+                } else if (response.status === 422) {
+                    showMessage(
+                        'error',
+                        'Please correct the highlighted field.'
+                    );
+
+                    if (result.field && result.error) {
+                        showFieldError(result.field, result.error);
+                    }
+                } else {
+                    showMessage(
+                        'error',
+                        'Unable to create the product. Please try again.'
+                    );
+                }
+            } catch (error) {
+                showMessage(
+                    'error',
+                    'A network error occurred. Please check your connection and try again.'
+                );
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Save Product';
+            }
+        });
+    </script>
 </body>
 </html>

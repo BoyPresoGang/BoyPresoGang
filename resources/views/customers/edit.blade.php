@@ -6,24 +6,17 @@
     <title>Edit Customer</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 40px;
-            background: #f8f9fa;
-            color: #212529;
-        }
-
-        .container {
-            max-width: 700px;
+        .page {
+            max-width: 800px;
             margin: 0 auto;
+            padding: 24px;
         }
 
-        .header {
+        .page-header {
             margin-bottom: 24px;
         }
 
-        h1 {
+        .page-header h1 {
             margin: 0;
         }
 
@@ -43,24 +36,13 @@
             margin-bottom: 20px;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
         }
 
-        .required {
-            color: #b02a37;
-        }
-
-        .form-note {
-            margin-bottom: 20px;
-            color: #6c757d;
-            font-size: 14px;
-        }
-
-        input,
-        textarea {
+        .form-group input {
             width: 100%;
             box-sizing: border-box;
             padding: 10px 12px;
@@ -69,21 +51,12 @@
             font-size: 16px;
         }
 
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        input:focus,
-        textarea:focus {
+        .form-group input:focus {
             outline: 3px solid rgba(13, 110, 253, 0.25);
             border-color: #0d6efd;
         }
 
-        .actions {
-            margin-top: 24px;
-        }
-
+        button,
         .button {
             display: inline-block;
             padding: 10px 16px;
@@ -96,81 +69,230 @@
             margin-right: 8px;
         }
 
-        .button:focus {
-            outline: 3px solid rgba(13, 110, 253, 0.25);
-            outline-offset: 2px;
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
-        .secondary-button {
+        .secondary {
             background: #6c757d;
+        }
+
+        .field-error,
+        .form-error {
+            color: #b02a37;
+            margin: 6px 0 0;
+        }
+
+        .form-success {
+            color: #146c43;
+            margin: 6px 0 12px;
         }
     </style>
 </head>
 
 <body>
-    <main class="container">
 
-        <header class="header">
-            <h1>Edit Customer</h1>
-            <p class="description">
-                Update the customer's information.
-            </p>
-        </header>
+<div class="page">
 
-        <section class="card" aria-label="Edit customer form">
+    <header class="page-header">
+        <h1>Edit Customer</h1>
+        <p class="description">
+            Update the customer information.
+        </p>
+    </header>
 
-            <form action="#" method="POST">
+    <section class="card">
 
-                <p class="form-note">
-                    <span class="required">*</span> Required fields
-                </p>
+        <form id="customer-edit-form">
 
-                <div class="form-group">
-                    <label for="name">Customer Name <span class="required">*</span></label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value="Juan Dela Cruz"
-                        autocomplete="name"
-                        required
-                        aria-required="true"
-                    >
-                </div>
+            <div class="form-group">
+                <label for="name">
+                    Customer Name <span aria-hidden="true">*</span>
+                </label>
 
-                <div class="form-group">
-                    <label for="contact_number">Contact Number <span class="required">*</span></label>
-                    <input
-                        type="tel"
-                        id="contact_number"
-                        name="contact_number"
-                        value="09171234567"
-                        autocomplete="tel"
-                        required
-                        aria-required="true"
-                    >
-                </div>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    minlength="2"
+                    maxlength="100"
+                    autocomplete="name"
+                >
 
-                <div class="form-group">
-                    <label for="address">Address <span class="required">*</span></label>
-                    <textarea
-                        id="address"
-                        name="address"
-                        autocomplete="street-address"
-                        required
-                        aria-required="true"
-                    >Purok 1, Barangay Poblacion</textarea>
-                </div>
+                <p id="name-error" class="field-error" role="alert"></p>
+            </div>
 
-                <div class="actions">
-                    <button type="submit" class="button">Update Customer</button>
-                    <a href="#" class="button secondary-button">Cancel</a>
-                </div>
+            <div class="form-group">
+                <label for="contact_number">
+                    Contact Number <span aria-hidden="true">*</span>
+                </label>
 
-            </form>
+                <input
+                    type="text"
+                    id="contact_number"
+                    name="contact_number"
+                    required
+                    minlength="7"
+                    maxlength="20"
+                    autocomplete="tel"
+                >
 
-        </section>
+                <p
+                    id="contact_number-error"
+                    class="field-error"
+                    role="alert"
+                ></p>
+            </div>
 
-    </main>
+            <p id="form-error" class="form-error" role="alert"></p>
+
+            <p id="form-success" class="form-success" role="status"></p>
+
+            <button id="submit-button" type="submit">
+                Update Customer
+            </button>
+
+            <a href="#" class="button secondary">
+                Cancel
+            </a>
+
+        </form>
+
+    </section>
+
+</div>
+
+<script>
+const customerForm =
+    document.getElementById('customer-edit-form');
+
+const customerSubmitButton =
+    document.getElementById('submit-button');
+
+const customerId =
+    new URLSearchParams(window.location.search).get('id') || 1;
+
+
+async function loadCustomer() {
+
+    try {
+
+        const response =
+            await fetch(`/api/customers/${customerId}`);
+
+        if (!response.ok) {
+            throw new Error('Unable to load customer.');
+        }
+
+        const result =
+            await response.json();
+
+        document.getElementById('name').value =
+            result.data.name ?? '';
+
+        document.getElementById('contact_number').value =
+            result.data.contact_number ?? '';
+
+    } catch (error) {
+
+        document.getElementById('form-error').textContent =
+            'Unable to load the customer. Please try again.';
+    }
+}
+
+
+customerForm.addEventListener('submit', async (event) => {
+
+    event.preventDefault();
+
+    customerSubmitButton.disabled = true;
+    customerSubmitButton.textContent = 'Updating...';
+
+    document.getElementById('form-error').textContent = '';
+    document.getElementById('form-success').textContent = '';
+
+    document.getElementById('name-error').textContent = '';
+    document.getElementById('contact_number-error').textContent = '';
+
+
+    const data = {
+
+        name: document.getElementById('name').value,
+
+        contact_number:
+            document.getElementById('contact_number').value
+
+    };
+
+
+    try {
+
+        const response = await fetch(
+            `/api/customers/${customerId}`,
+            {
+                method: 'PUT',
+
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                body: JSON.stringify(data)
+            }
+        );
+
+
+        const result =
+            await response.json();
+
+
+        if (response.status === 200) {
+
+            document.getElementById('form-success').textContent =
+                'Customer updated successfully.';
+
+        } else if (response.status === 422) {
+
+            const field = result.field;
+            const message = result.error;
+
+            const fieldError =
+                document.getElementById(`${field}-error`);
+
+            if (fieldError) {
+
+                fieldError.textContent = message;
+
+            } else {
+
+                document.getElementById('form-error').textContent =
+                    message;
+            }
+
+        } else {
+
+            document.getElementById('form-error').textContent =
+                'The customer could not be updated.';
+        }
+
+    } catch (error) {
+
+        document.getElementById('form-error').textContent =
+            'A network error occurred. Please try again.';
+
+    } finally {
+
+        customerSubmitButton.disabled = false;
+        customerSubmitButton.textContent = 'Update Customer';
+    }
+
+});
+
+
+loadCustomer();
+</script>
+
 </body>
 </html>

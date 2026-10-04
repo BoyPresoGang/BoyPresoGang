@@ -168,7 +168,7 @@
                 Update Product
             </button>
 
-            <a href="#" class="button secondary">
+            <a href="/products" class="button secondary">
                 Cancel
             </a>
 

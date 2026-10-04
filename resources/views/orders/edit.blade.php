@@ -153,9 +153,10 @@
                         min="1"
                         required
                         aria-required="true"
+                        aria-describedby="customer_id-error"
                     >
 
-                    <p id="customer_id-error" class="field-error"></p>
+                    <p id="customer_id-error" class="field-error" role="alert"></p>
                 </div>
 
                 <div class="form-group">
@@ -170,9 +171,10 @@
                         min="1"
                         required
                         aria-required="true"
+                        aria-describedby="product_id-error"
                     >
 
-                    <p id="product_id-error" class="field-error"></p>
+                    <p id="product_id-error" class="field-error" role="alert"></p>
                 </div>
 
                 <div class="form-group">
@@ -187,9 +189,10 @@
                         min="1"
                         required
                         aria-required="true"
+                        aria-describedby="quantity-error"
                     >
 
-                    <p id="quantity-error" class="field-error"></p>
+                    <p id="quantity-error" class="field-error" role="alert"></p>
                 </div>
 
                 <p id="form-error" class="form-error"></p>
@@ -221,6 +224,68 @@
         const orderId =
             new URLSearchParams(window.location.search).get('id') || 1;
 
+        const orderFieldIds = [
+            'customer_id',
+            'product_id',
+            'quantity'
+        ];
+
+        function clearOrderFieldErrors() {
+            orderFieldIds.forEach((fieldId) => {
+                document.getElementById(fieldId)
+                    .removeAttribute('aria-invalid');
+                document.getElementById(`${fieldId}-error`).textContent = '';
+            });
+        }
+
+        function showOrderFieldError(fieldId, message) {
+            if (!orderFieldIds.includes(fieldId)) {
+                return false;
+            }
+
+            const label = document.querySelector(`label[for="${fieldId}"]`);
+            const fieldName = label
+                ? label.textContent.replace(/\s*\*$/, '').trim()
+                : 'This field';
+            const details = Array.isArray(message) ? message[0] : message;
+
+            document.getElementById(fieldId)
+                .setAttribute('aria-invalid', 'true');
+            document.getElementById(`${fieldId}-error`).textContent =
+                `${fieldName}: ${
+                    typeof details === 'string' && details.trim()
+                        ? details
+                        : 'Please enter a valid value.'
+                }`;
+            return true;
+        }
+
+        function showOrderValidationErrors(result) {
+            let hasFieldErrors = false;
+
+            if (result && typeof result.field === 'string') {
+                hasFieldErrors = showOrderFieldError(
+                    result.field,
+                    result.error
+                ) || hasFieldErrors;
+            }
+
+            if (result && result.errors &&
+                typeof result.errors === 'object' &&
+                !Array.isArray(result.errors)) {
+                Object.entries(result.errors).forEach(
+                    ([fieldId, message]) => {
+                        hasFieldErrors = showOrderFieldError(
+                            fieldId,
+                            message
+                        ) || hasFieldErrors;
+                    }
+                );
+            }
+
+            return hasFieldErrors;
+        }
+
         async function loadOrder() {
             try {
                 const response = await fetch(`/api/orders/${orderId}`);
@@ -248,15 +313,17 @@
         orderForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
+            if (orderSubmitButton.disabled) {
+                return;
+            }
+
             orderSubmitButton.disabled = true;
             orderSubmitButton.textContent = 'Updating...';
 
             document.getElementById('form-error').textContent = '';
             document.getElementById('form-success').textContent = '';
 
-            document.getElementById('customer_id-error').textContent = '';
-            document.getElementById('product_id-error').textContent = '';
-            document.getElementById('quantity-error').textContent = '';
+            clearOrderFieldErrors();
 
             const data = {
                 customer_id:
@@ -287,33 +354,19 @@
                     document.getElementById('form-success').textContent =
                         'Order updated successfully.';
                 } else if (response.status === 422) {
-                    if (result.errors) {
-                        Object.entries(result.errors).forEach(
-                            ([field, messages]) => {
-                                const errorElement =
-                                    document.getElementById(
-                                        `${field}-error`
-                                    );
-
-                                if (errorElement) {
-                                    errorElement.textContent =
-                                        Array.isArray(messages)
-                                            ? messages[0]
-                                            : messages;
-                                }
-                            }
-                        );
-                    } else {
-                        document.getElementById('form-error').textContent =
-                            'Please check the form for errors.';
-                    }
+                    const hasFieldErrors =
+                        showOrderValidationErrors(result);
+                    document.getElementById('form-error').textContent =
+                        hasFieldErrors
+                            ? 'Please correct the highlighted fields and try again.'
+                            : 'Please review the order information and try again.';
                 } else {
                     document.getElementById('form-error').textContent =
-                        'Unable to update the order. Please try again.';
+                        'Unable to update the order. Please try again later.';
                 }
             } catch (error) {
                 document.getElementById('form-error').textContent =
-                    'A network error occurred. Please try again.';
+                    'Unable to reach the server. Please check your connection and try again.';
             } finally {
                 orderSubmitButton.disabled = false;
                 orderSubmitButton.textContent = 'Update Order';

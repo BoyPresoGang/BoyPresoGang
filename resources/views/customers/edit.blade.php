@@ -119,6 +119,7 @@
                     minlength="2"
                     maxlength="100"
                     autocomplete="name"
+                    aria-describedby="name-error"
                 >
 
                 <p id="name-error" class="field-error" role="alert"></p>
@@ -137,6 +138,7 @@
                     minlength="7"
                     maxlength="20"
                     autocomplete="tel"
+                    aria-describedby="contact_number-error"
                 >
 
                 <p
@@ -174,6 +176,59 @@ const customerSubmitButton =
 const customerId =
     new URLSearchParams(window.location.search).get('id') || 1;
 
+const customerFieldIds = ['name', 'contact_number'];
+
+function clearCustomerFieldErrors() {
+    customerFieldIds.forEach((fieldId) => {
+        document.getElementById(fieldId).removeAttribute('aria-invalid');
+        document.getElementById(`${fieldId}-error`).textContent = '';
+    });
+}
+
+function showCustomerFieldError(fieldId, message) {
+    if (!customerFieldIds.includes(fieldId)) {
+        return false;
+    }
+
+    const label = document.querySelector(`label[for="${fieldId}"]`);
+    const fieldName = label
+        ? label.textContent.replace(/\s*\*$/, '').trim()
+        : 'This field';
+    const details = Array.isArray(message) ? message[0] : message;
+
+    document.getElementById(fieldId).setAttribute('aria-invalid', 'true');
+    document.getElementById(`${fieldId}-error`).textContent =
+        `${fieldName}: ${
+            typeof details === 'string' && details.trim()
+                ? details
+                : 'Please enter a valid value.'
+        }`;
+    return true;
+}
+
+function showCustomerValidationErrors(result) {
+    let hasFieldErrors = false;
+
+    if (result && typeof result.field === 'string') {
+        hasFieldErrors = showCustomerFieldError(
+            result.field,
+            result.error
+        ) || hasFieldErrors;
+    }
+
+    if (result && result.errors &&
+        typeof result.errors === 'object' &&
+        !Array.isArray(result.errors)) {
+        Object.entries(result.errors).forEach(([fieldId, message]) => {
+            hasFieldErrors = showCustomerFieldError(
+                fieldId,
+                message
+            ) || hasFieldErrors;
+        });
+    }
+
+    return hasFieldErrors;
+}
 
 async function loadCustomer() {
 
@@ -207,14 +262,17 @@ customerForm.addEventListener('submit', async (event) => {
 
     event.preventDefault();
 
+    if (customerSubmitButton.disabled) {
+        return;
+    }
+
     customerSubmitButton.disabled = true;
     customerSubmitButton.textContent = 'Updating...';
 
     document.getElementById('form-error').textContent = '';
     document.getElementById('form-success').textContent = '';
 
-    document.getElementById('name-error').textContent = '';
-    document.getElementById('contact_number-error').textContent = '';
+    clearCustomerFieldErrors();
 
 
     const data = {
@@ -255,32 +313,24 @@ customerForm.addEventListener('submit', async (event) => {
 
         } else if (response.status === 422) {
 
-            const field = result.field;
-            const message = result.error;
+            const hasFieldErrors =
+                showCustomerValidationErrors(result);
 
-            const fieldError =
-                document.getElementById(`${field}-error`);
-
-            if (fieldError) {
-
-                fieldError.textContent = message;
-
-            } else {
-
-                document.getElementById('form-error').textContent =
-                    message;
-            }
+            document.getElementById('form-error').textContent =
+                hasFieldErrors
+                    ? 'Please correct the highlighted fields and try again.'
+                    : 'Please review the customer information and try again.';
 
         } else {
 
             document.getElementById('form-error').textContent =
-                'The customer could not be updated.';
+                'Unable to update the customer. Please try again later.';
         }
 
     } catch (error) {
 
         document.getElementById('form-error').textContent =
-            'A network error occurred. Please try again.';
+            'Unable to reach the server. Please check your connection and try again.';
 
     } finally {
 

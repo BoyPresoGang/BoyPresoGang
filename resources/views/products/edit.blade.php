@@ -118,6 +118,7 @@
                     required
                     minlength="2"
                     maxlength="100"
+                    aria-describedby="name-error"
                 >
 
                 <p id="name-error" class="field-error" role="alert"></p>
@@ -135,6 +136,7 @@
                     required
                     min="0"
                     step="0.01"
+                    aria-describedby="price-error"
                 >
 
                 <p id="price-error" class="field-error" role="alert"></p>
@@ -152,6 +154,7 @@
                     required
                     min="0"
                     step="1"
+                    aria-describedby="stock-error"
                 >
 
                 <p id="stock-error" class="field-error" role="alert"></p>
@@ -182,6 +185,59 @@ const productSubmitButton = document.getElementById('submit-button');
 const productId =
     new URLSearchParams(window.location.search).get('id') || 1;
 
+const productFieldIds = ['name', 'price', 'stock'];
+
+function clearProductFieldErrors() {
+    productFieldIds.forEach((fieldId) => {
+        document.getElementById(fieldId).removeAttribute('aria-invalid');
+        document.getElementById(`${fieldId}-error`).textContent = '';
+    });
+}
+
+function showProductFieldError(fieldId, message) {
+    if (!productFieldIds.includes(fieldId)) {
+        return false;
+    }
+
+    const label = document.querySelector(`label[for="${fieldId}"]`);
+    const fieldName = label
+        ? label.textContent.replace(/\s*\*$/, '').trim()
+        : 'This field';
+    const details = Array.isArray(message) ? message[0] : message;
+
+    document.getElementById(fieldId).setAttribute('aria-invalid', 'true');
+    document.getElementById(`${fieldId}-error`).textContent =
+        `${fieldName}: ${
+            typeof details === 'string' && details.trim()
+                ? details
+                : 'Please enter a valid value.'
+        }`;
+    return true;
+}
+
+function showProductValidationErrors(result) {
+    let hasFieldErrors = false;
+
+    if (result && typeof result.field === 'string') {
+        hasFieldErrors = showProductFieldError(
+            result.field,
+            result.error
+        ) || hasFieldErrors;
+    }
+
+    if (result && result.errors &&
+        typeof result.errors === 'object' &&
+        !Array.isArray(result.errors)) {
+        Object.entries(result.errors).forEach(([fieldId, message]) => {
+            hasFieldErrors = showProductFieldError(
+                fieldId,
+                message
+            ) || hasFieldErrors;
+        });
+    }
+
+    return hasFieldErrors;
+}
 
 async function loadProduct() {
 
@@ -217,15 +273,17 @@ productForm.addEventListener('submit', async (event) => {
 
     event.preventDefault();
 
+    if (productSubmitButton.disabled) {
+        return;
+    }
+
     productSubmitButton.disabled = true;
     productSubmitButton.textContent = 'Updating...';
 
     document.getElementById('form-error').textContent = '';
     document.getElementById('form-success').textContent = '';
 
-    document.getElementById('name-error').textContent = '';
-    document.getElementById('price-error').textContent = '';
-    document.getElementById('stock-error').textContent = '';
+    clearProductFieldErrors();
 
 
     const data = {
@@ -266,32 +324,24 @@ productForm.addEventListener('submit', async (event) => {
 
         } else if (response.status === 422) {
 
-            const field = result.field;
-            const message = result.error;
+            const hasFieldErrors =
+                showProductValidationErrors(result);
 
-            const fieldError =
-                document.getElementById(`${field}-error`);
-
-            if (fieldError) {
-
-                fieldError.textContent = message;
-
-            } else {
-
-                document.getElementById('form-error').textContent =
-                    message;
-            }
+            document.getElementById('form-error').textContent =
+                hasFieldErrors
+                    ? 'Please correct the highlighted fields and try again.'
+                    : 'Please review the product information and try again.';
 
         } else {
 
             document.getElementById('form-error').textContent =
-                'The product could not be updated.';
+                'Unable to update the product. Please try again later.';
         }
 
     } catch (error) {
 
         document.getElementById('form-error').textContent =
-            'A network error occurred. Please try again.';
+            'Unable to reach the server. Please check your connection and try again.';
 
     } finally {
 

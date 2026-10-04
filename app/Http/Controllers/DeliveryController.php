@@ -46,6 +46,16 @@ class DeliveryController extends Controller
         return $validator->validated();
     }
 
+    public function listDeliveries()
+    {
+        $deliveries = Delivery::all();
+
+        return response()->json([
+            'status' => 200,
+            'data' => $deliveries,
+        ], 200);
+    }
+
     public function createDelivery(Request $request)
     {
         $result = $this->validateOrFail($request);

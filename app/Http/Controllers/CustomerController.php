@@ -43,6 +43,16 @@ class CustomerController extends Controller
         return $validator->validated();
     }
 
+    public function listCustomers()
+    {
+        $customers = Customer::all();
+
+        return response()->json([
+            'status' => 200,
+            'data' => $customers,
+        ], 200);
+    }
+
     public function createCustomer(Request $request)
     {
         $result = $this->validateOrFail($request);

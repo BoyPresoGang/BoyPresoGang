@@ -43,6 +43,16 @@ class ProductController extends Controller
         return $validator->validated();
     }
 
+    public function listProducts()
+    {
+        $products = Product::all();
+
+        return response()->json([
+            'status' => 200,
+            'data' => $products,
+        ], 200);
+    }
+
     public function createProduct(Request $request)
     {
         $result = $this->validateOrFail($request);

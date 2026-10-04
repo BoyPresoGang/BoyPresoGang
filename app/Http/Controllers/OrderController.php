@@ -43,6 +43,16 @@ class OrderController extends Controller
         return $validator->validated();
     }
 
+    public function listOrders()
+    {
+        $orders = Order::all();
+
+        return response()->json([
+            'status' => 200,
+            'data' => $orders,
+        ], 200);
+    }
+
     public function createOrder(Request $request)
     {
         $result = $this->validateOrFail($request);

@@ -4,175 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customers</title>
-
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 40px;
-            background: #f8f9fa;
-            color: #212529;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        h1 {
-            margin: 0;
-        }
-
-        .description {
-            color: #6c757d;
-            margin-top: 6px;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 10px 16px;
-            background: #212529;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-
-        .table-container {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        th {
-            background: #f1f3f5;
-            font-weight: 600;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .actions a {
-            margin-right: 10px;
-            color: #212529;
-        }
-                .state-message {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 32px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .state-message h2 {
-            margin-top: 0;
-        }
-
-        .state-message p {
-            color: #6c757d;
-        }
-
-        .error-state {
-            border-color: #dc3545;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 40px; background: #f8f9fa; color: #212529; }
+        .container { max-width: 1100px; margin: 0 auto; } .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        h1 { margin: 0; } .description { color: #6c757d; margin-top: 6px; } .button { display: inline-block; padding: 10px 16px; background: #212529; color: white; text-decoration: none; border: 0; border-radius: 6px; cursor: pointer; }
+        .table-container, .state-message { background: white; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; } th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #dee2e6; } th { background: #f1f3f5; font-weight: 600; } tr:last-child td { border-bottom: none; }
+        .actions a { margin-right: 10px; color: #212529; } .state-message { padding: 32px; margin-bottom: 20px; text-align: center; } .state-message h2 { margin-top: 0; } .state-message p { color: #6c757d; } .error-state { border-color: #dc3545; }
     </style>
 </head>
-
 <body>
-    <main class="container">
-
-        <header class="header">
-            <div>
-                <h1>Customers</h1>
-                <p class="description">
-                    Manage customers registered in the water refilling station.
-                </p>
-            </div>
-
-            <a href="#" class="button">Add Customer</a>
-        </header>
-
-        <section class="table-container" aria-label="Customer list">
-                   {{-- Empty State --}}
-        <section class="state-message" aria-label="Empty customer list">
-            <h2>No customers yet</h2>
-            <p>There are currently no customers registered in the system.</p>
-            <a href="#" class="button">Add Customer</a>
-        </section>
-
-        {{-- Loading State --}}
-        <section class="state-message" aria-label="Loading customer list">
-            <h2>Loading customers...</h2>
-            <p>Please wait while the customer records are being loaded.</p>
-        </section>
-
-        {{-- Error State --}}
-        <section class="state-message error-state" aria-label="Customer list error">
-            <h2>Unable to load customers</h2>
-            <p>Something went wrong while loading the customer records. Please try again.</p>
-            <a href="#" class="button">Try Again</a>
-        </section>
-
-        {{-- Customer List --}}
-        <section class="table-container" aria-label="Customer list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Contact Number</th>
-                        <th>Address</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Juan Dela Cruz</td>
-                        <td>0917-123-4567</td>
-                        <td>Maramag, Bukidnon</td>
-                        <td class="actions">
-                            <a href="#">View</a>
-                            <a href="#">Edit</a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Maria Santos</td>
-                        <td>0918-987-6543</td>
-                        <td>Quezon City</td>
-                        <td class="actions">
-                            <a href="#">View</a>
-                            <a href="#">Edit</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-    </main>
+<main class="container">
+    <header class="header"><div><h1>Customers</h1><p class="description">Manage customers registered in the water refilling station.</p></div><a href="/customers/create" class="button">Add Customer</a></header>
+    <section id="loading-state" class="state-message" aria-label="Loading customer list"><h2>Loading customers...</h2><p>Please wait while the customer records are being loaded.</p></section>
+    <section id="empty-state" class="state-message" aria-label="Empty customer list" hidden><h2>No customers yet</h2><p>There are currently no customers registered in the system.</p><a href="/customers/create" class="button">Add Customer</a></section>
+    <section id="error-state" class="state-message error-state" aria-label="Customer list error" hidden><h2>Unable to load customers</h2><p id="error-message">Something went wrong while loading the customer records.</p><button id="try-again" type="button" class="button">Try Again</button></section>
+    <section id="list-state" class="table-container" aria-label="Customer list" hidden><table><thead><tr><th>ID</th><th>Name</th><th>Contact Number</th><th>Actions</th></tr></thead><tbody id="customer-rows"></tbody></table></section>
+</main>
+<script>
+const states = { loading: document.getElementById('loading-state'), empty: document.getElementById('empty-state'), error: document.getElementById('error-state'), list: document.getElementById('list-state') };
+const rows = document.getElementById('customer-rows'), errorMessage = document.getElementById('error-message');
+function showState(name) { Object.entries(states).forEach(([key, element]) => { element.hidden = key !== name; }); }
+function cell(value) { const element = document.createElement('td'); element.textContent = value == null ? '' : String(value); return element; }
+function actions(id) { const element = document.createElement('td'); element.className = 'actions'; [['View', '/customers/'], ['Edit', '/customers/edit/']].forEach(([label, path]) => { const link = document.createElement('a'); link.href = path + encodeURIComponent(String(id)); link.textContent = label; element.append(link); }); return element; }
+async function loadCustomers() {
+    showState('loading');
+    try {
+        const response = await fetch('/api/customers', { headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error('The customer service returned an error.');
+        const payload = await response.json();
+        if (!payload || !Array.isArray(payload.data) || payload.data.some(item => !item || item.id == null)) throw new Error('The customer service returned an invalid response.');
+        rows.replaceChildren();
+        payload.data.forEach(customer => { const row = document.createElement('tr'); row.append(cell(customer.id), cell(customer.name), cell(customer.contact_number), actions(customer.id)); rows.append(row); });
+        showState(payload.data.length ? 'list' : 'empty');
+    } catch (error) { errorMessage.textContent = error instanceof Error ? error.message : 'Please try again later.'; showState('error'); }
+}
+document.getElementById('try-again').addEventListener('click', loadCustomers); loadCustomers();
+</script>
 </body>
 </html>

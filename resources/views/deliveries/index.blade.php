@@ -1,181 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deliveries</title>
-
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Deliveries</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 40px;
-            background: #f8f9fa;
-            color: #212529;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        h1 {
-            margin: 0;
-        }
-
-        .description {
-            color: #6c757d;
-            margin-top: 6px;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 10px 16px;
-            background: #212529;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-
-        .table-container {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        th {
-            background: #f1f3f5;
-            font-weight: 600;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .actions a {
-            margin-right: 10px;
-            color: #212529;
-        }
-                .state-message {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 32px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .state-message h2 {
-            margin-top: 0;
-        }
-
-        .state-message p {
-            color: #6c757d;
-        }
-
-        .error-state {
-            border-color: #dc3545;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 40px; background: #f8f9fa; color: #212529; } .container { max-width: 1100px; margin: 0 auto; } .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; } h1 { margin: 0; } .description { color: #6c757d; margin-top: 6px; } .button { display: inline-block; padding: 10px 16px; background: #212529; color: white; text-decoration: none; border: 0; border-radius: 6px; cursor: pointer; } .table-container, .state-message { background: white; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; } table { width: 100%; border-collapse: collapse; } th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #dee2e6; } th { background: #f1f3f5; font-weight: 600; } tr:last-child td { border-bottom: none; } .actions a { margin-right: 10px; color: #212529; } .state-message { padding: 32px; margin-bottom: 20px; text-align: center; } .state-message h2 { margin-top: 0; } .state-message p { color: #6c757d; } .error-state { border-color: #dc3545; }
     </style>
 </head>
-
-<body>
-    <main class="container">
-
-        <header class="header">
-            <div>
-                <h1>Deliveries</h1>
-                <p class="description">
-                    Track and manage water product deliveries.
-                </p>
-            </div>
-
-            <a href="#" class="button">Add Delivery</a>
-        </header>
-
-        <section class="table-container" aria-label="Delivery list">
-                    {{-- Empty State --}}
-        <section class="state-message" aria-label="Empty delivery list">
-            <h2>No deliveries yet</h2>
-            <p>There are currently no deliveries registered in the system.</p>
-            <a href="#" class="button">Add Delivery</a>
-        </section>
-
-        {{-- Loading State --}}
-        <section class="state-message" aria-label="Loading delivery list">
-            <h2>Loading deliveries...</h2>
-            <p>Please wait while the delivery records are being loaded.</p>
-        </section>
-
-        {{-- Error State --}}
-        <section class="state-message error-state" aria-label="Delivery list error">
-            <h2>Unable to load deliveries</h2>
-            <p>Something went wrong while loading the delivery records. Please try again.</p>
-            <a href="#" class="button">Try Again</a>
-        </section>
-
-        {{-- Delivery List --}}
-        <section class="table-container" aria-label="Delivery list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Order</th>
-                        <th>Customer</th>
-                        <th>Delivery Address</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>#1001</td>
-                        <td>Juan Dela Cruz</td>
-                        <td>Maramag, Bukidnon</td>
-                        <td>Pending</td>
-                        <td class="actions">
-                            <a href="#">View</a>
-                            <a href="#">Edit</a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>#1002</td>
-                        <td>Maria Santos</td>
-                        <td>Quezon City</td>
-                        <td>Delivered</td>
-                        <td class="actions">
-                            <a href="#">View</a>
-                            <a href="#">Edit</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-    </main>
-</body>
-</html>
+<body><main class="container">
+    <header class="header"><div><h1>Deliveries</h1><p class="description">Track and manage water product deliveries.</p></div><a href="/deliveries/create" class="button">Add Delivery</a></header>
+    <section id="loading-state" class="state-message" aria-label="Loading delivery list"><h2>Loading deliveries...</h2><p>Please wait while the delivery records are being loaded.</p></section>
+    <section id="empty-state" class="state-message" aria-label="Empty delivery list" hidden><h2>No deliveries yet</h2><p>There are currently no deliveries registered in the system.</p><a href="/deliveries/create" class="button">Add Delivery</a></section>
+    <section id="error-state" class="state-message error-state" aria-label="Delivery list error" hidden><h2>Unable to load deliveries</h2><p id="error-message">Something went wrong while loading the delivery records.</p><button id="try-again" type="button" class="button">Try Again</button></section>
+    <section id="list-state" class="table-container" aria-label="Delivery list" hidden><table><thead><tr><th>ID</th><th>Customer ID</th><th>Delivery Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="delivery-rows"></tbody></table></section>
+</main><script>
+const states = { loading: document.getElementById('loading-state'), empty: document.getElementById('empty-state'), error: document.getElementById('error-state'), list: document.getElementById('list-state') }, rows = document.getElementById('delivery-rows'), errorMessage = document.getElementById('error-message');
+function showState(name) { Object.entries(states).forEach(([key, element]) => { element.hidden = key !== name; }); } function cell(value) { const e = document.createElement('td'); e.textContent = value == null ? '' : String(value); return e; } function actions(id) { const e = document.createElement('td'); e.className = 'actions'; [['View', '/deliveries/'], ['Edit', '/deliveries/edit/']].forEach(([label, path]) => { const a = document.createElement('a'); a.href = path + encodeURIComponent(String(id)); a.textContent = label; e.append(a); }); return e; }
+async function loadDeliveries() { showState('loading'); try { const response = await fetch('/api/deliveries', { headers: { Accept: 'application/json' } }); if (!response.ok) throw new Error('The delivery service returned an error.'); const payload = await response.json(); if (!payload || !Array.isArray(payload.data) || payload.data.some(item => !item || item.id == null)) throw new Error('The delivery service returned an invalid response.'); rows.replaceChildren(); payload.data.forEach(delivery => { const row = document.createElement('tr'); row.append(cell(delivery.id), cell(delivery.customer_id), cell(delivery.delivery_date), cell(delivery.status), actions(delivery.id)); rows.append(row); }); showState(payload.data.length ? 'list' : 'empty'); } catch (error) { errorMessage.textContent = error instanceof Error ? error.message : 'Please try again later.'; showState('error'); } }
+document.getElementById('try-again').addEventListener('click', loadDeliveries); loadDeliveries();
+</script></body></html>

@@ -292,17 +292,55 @@
             const field = document.getElementById(fieldId);
             const error = document.getElementById(fieldId + '-error');
 
-            if (!field || !error) {
-                return;
+            if (!field || !error || !fieldIds.includes(fieldId)) {
+                return false;
             }
 
+            const label = document.querySelector('label[for="' + fieldId + '"]');
+            const fieldName = label
+                ? label.textContent.replace(/\s*\*$/, '').trim()
+                : 'This field';
+            const details = Array.isArray(message) ? message[0] : message;
+
             field.classList.add('input-error');
-            error.textContent = message;
+            error.textContent = fieldName + ': ' +
+                (typeof details === 'string' && details.trim()
+                    ? details
+                    : 'Please enter a valid value.');
             error.classList.add('visible');
+            return true;
+        }
+
+        function showValidationErrors(result) {
+            let hasFieldErrors = false;
+
+            if (result && typeof result.field === 'string') {
+                hasFieldErrors = showFieldError(
+                    result.field,
+                    result.error
+                ) || hasFieldErrors;
+            }
+
+            if (result && result.errors &&
+                typeof result.errors === 'object' &&
+                !Array.isArray(result.errors)) {
+                Object.entries(result.errors).forEach(function (entry) {
+                    hasFieldErrors = showFieldError(
+                        entry[0],
+                        entry[1]
+                    ) || hasFieldErrors;
+                });
+            }
+
+            return hasFieldErrors;
         }
 
         deliveryForm.addEventListener('submit', async function (event) {
             event.preventDefault();
+
+            if (submitButton.disabled) {
+                return;
+            }
 
             clearMessages();
 
@@ -338,29 +376,25 @@
                     deliveryForm.reset();
 
                 } else if (response.status === 422) {
+                    const hasFieldErrors = showValidationErrors(result);
                     showMessage(
                         'error',
-                        'Please correct the highlighted field.'
+                        hasFieldErrors
+                            ? 'Please correct the highlighted fields and try again.'
+                            : 'Please review the delivery information and try again.'
                     );
-
-                    if (result.field && result.error) {
-                        showFieldError(
-                            result.field,
-                            result.error
-                        );
-                    }
 
                 } else {
                     showMessage(
                         'error',
-                        'Unable to create the delivery. Please try again.'
+                        'Unable to create the delivery. Please try again later.'
                     );
                 }
 
             } catch (error) {
                 showMessage(
                     'error',
-                    'A network error occurred. Please check your connection and try again.'
+                    'Unable to reach the server. Please check your connection and try again.'
                 );
 
             } finally {

@@ -156,9 +156,10 @@
                         min="1"
                         required
                         aria-required="true"
+                        aria-describedby="customer_id-error"
                     >
 
-                    <p id="customer_id-error" class="field-error"></p>
+                    <p id="customer_id-error" class="field-error" role="alert"></p>
                 </div>
 
                 <div class="form-group">
@@ -172,9 +173,10 @@
                         name="delivery_date"
                         required
                         aria-required="true"
+                        aria-describedby="delivery_date-error"
                     >
 
-                    <p id="delivery_date-error" class="field-error"></p>
+                    <p id="delivery_date-error" class="field-error" role="alert"></p>
                 </div>
 
                 <div class="form-group">
@@ -187,6 +189,7 @@
                         name="status"
                         required
                         aria-required="true"
+                        aria-describedby="status-error"
                     >
                         <option value="scheduled">Scheduled</option>
                         <option value="in_transit">In Transit</option>
@@ -194,7 +197,7 @@
                         <option value="cancelled">Cancelled</option>
                     </select>
 
-                    <p id="status-error" class="field-error"></p>
+                    <p id="status-error" class="field-error" role="alert"></p>
                 </div>
 
                 <p id="form-error" class="form-error"></p>
@@ -229,6 +232,68 @@
         const deliveryId =
             new URLSearchParams(window.location.search).get('id') || 1;
 
+        const deliveryFieldIds = [
+            'customer_id',
+            'delivery_date',
+            'status'
+        ];
+
+        function clearDeliveryFieldErrors() {
+            deliveryFieldIds.forEach((fieldId) => {
+                document.getElementById(fieldId)
+                    .removeAttribute('aria-invalid');
+                document.getElementById(`${fieldId}-error`).textContent = '';
+            });
+        }
+
+        function showDeliveryFieldError(fieldId, message) {
+            if (!deliveryFieldIds.includes(fieldId)) {
+                return false;
+            }
+
+            const label = document.querySelector(`label[for="${fieldId}"]`);
+            const fieldName = label
+                ? label.textContent.replace(/\s*\*$/, '').trim()
+                : 'This field';
+            const details = Array.isArray(message) ? message[0] : message;
+
+            document.getElementById(fieldId)
+                .setAttribute('aria-invalid', 'true');
+            document.getElementById(`${fieldId}-error`).textContent =
+                `${fieldName}: ${
+                    typeof details === 'string' && details.trim()
+                        ? details
+                        : 'Please enter a valid value.'
+                }`;
+            return true;
+        }
+
+        function showDeliveryValidationErrors(result) {
+            let hasFieldErrors = false;
+
+            if (result && typeof result.field === 'string') {
+                hasFieldErrors = showDeliveryFieldError(
+                    result.field,
+                    result.error
+                ) || hasFieldErrors;
+            }
+
+            if (result && result.errors &&
+                typeof result.errors === 'object' &&
+                !Array.isArray(result.errors)) {
+                Object.entries(result.errors).forEach(
+                    ([fieldId, message]) => {
+                        hasFieldErrors = showDeliveryFieldError(
+                            fieldId,
+                            message
+                        ) || hasFieldErrors;
+                    }
+                );
+            }
+
+            return hasFieldErrors;
+        }
+
         async function loadDelivery() {
             try {
                 const response =
@@ -258,15 +323,17 @@
         deliveryForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
+            if (deliverySubmitButton.disabled) {
+                return;
+            }
+
             deliverySubmitButton.disabled = true;
             deliverySubmitButton.textContent = 'Updating...';
 
             document.getElementById('form-error').textContent = '';
             document.getElementById('form-success').textContent = '';
 
-            document.getElementById('customer_id-error').textContent = '';
-            document.getElementById('delivery_date-error').textContent = '';
-            document.getElementById('status-error').textContent = '';
+            clearDeliveryFieldErrors();
 
             const data = {
                 customer_id:
@@ -299,38 +366,22 @@
                         'Delivery updated successfully.';
 
                 } else if (response.status === 422) {
-
-                    if (result.errors) {
-                        Object.entries(result.errors).forEach(
-                            ([field, messages]) => {
-
-                                const errorElement =
-                                    document.getElementById(
-                                        `${field}-error`
-                                    );
-
-                                if (errorElement) {
-                                    errorElement.textContent =
-                                        Array.isArray(messages)
-                                            ? messages[0]
-                                            : messages;
-                                }
-                            }
-                        );
-
-                    } else {
-                        document.getElementById('form-error').textContent =
-                            'Please check the form for errors.';
-                    }
+                    const hasFieldErrors =
+                        showDeliveryValidationErrors(result);
+                    document.getElementById('form-error').textContent =
+                        hasFieldErrors
+                            ? 'Please correct the highlighted fields and try again.'
+                            : 'Please review the delivery information and try again.';
 
                 } else {
                     document.getElementById('form-error').textContent =
-                        'Unable to update the delivery. Please try again.';
+                        'Unable to update the delivery. Please try again later.';
+
                 }
 
             } catch (error) {
                 document.getElementById('form-error').textContent =
-                    'A network error occurred. Please try again.';
+                    'Unable to reach the server. Please check your connection and try again.';
 
             } finally {
                 deliverySubmitButton.disabled = false;

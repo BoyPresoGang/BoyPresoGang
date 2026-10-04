@@ -211,7 +211,7 @@
                         Update Delivery
                     </button>
 
-                    <a href="#" class="button secondary-button">
+                    <a href="/deliveries" class="button secondary-button">
                         Cancel
                     </a>
                 </div>

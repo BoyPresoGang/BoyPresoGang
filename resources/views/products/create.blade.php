@@ -241,7 +241,7 @@
                         Save Product
                     </button>
 
-                    <a href="#" class="button secondary-button">
+                    <a href="/products" class="button secondary-button">
                         Cancel
                     </a>
                 </div>

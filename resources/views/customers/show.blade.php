@@ -71,7 +71,8 @@
         .secondary-button {
             background: #6c757d;
         }
-                .state-message {
+
+        .state-message {
             background: white;
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -91,67 +92,133 @@
         .error-state {
             border-color: #dc3545;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
     <main class="container">
-
         <header class="header">
             <h1>Customer Details</h1>
             <p class="description">
                 View the complete information for this customer.
             </p>
         </header>
-                {{-- Empty State --}}
-        <section class="state-message" aria-label="Customer not found">
+
+        <section class="state-message" data-state="not-found" aria-label="Customer not found" hidden>
             <h2>Customer not found</h2>
-            <p>The requested customer record does not exist.</p>
+            <p>The requested customer record was not found.</p>
             <a href="#" class="button secondary-button">Back to Customers</a>
         </section>
 
-        {{-- Loading State --}}
-        <section class="state-message" aria-label="Loading customer details">
+        <section class="state-message" data-state="loading" aria-label="Loading customer details">
             <h2>Loading customer details...</h2>
             <p>Please wait while the customer information is being loaded.</p>
         </section>
 
-        {{-- Error State --}}
-        <section class="state-message error-state" aria-label="Customer details error">
+        <section class="state-message error-state" data-state="error" aria-label="Customer details error" hidden>
             <h2>Unable to load customer</h2>
             <p>Something went wrong while loading this customer's information.</p>
-            <a href="#" class="button">Try Again</a>
+            <a href="#" class="button" data-retry="customer">Try Again</a>
         </section>
-        
-        <section class="card" aria-label="Customer details">
 
+        <section class="card" data-state="success" aria-label="Customer details" hidden>
             <div class="detail-row">
                 <span class="label">Customer ID</span>
-                <span>1</span>
+                <span id="customer-id">-</span>
             </div>
 
             <div class="detail-row">
                 <span class="label">Name</span>
-                <span>Juan Dela Cruz</span>
+                <span id="customer-name">-</span>
             </div>
 
             <div class="detail-row">
                 <span class="label">Contact Number</span>
-                <span>0917-123-4567</span>
-            </div>
-
-            <div class="detail-row">
-                <span class="label">Address</span>
-                <span>Maramag, Bukidnon</span>
+                <span id="customer-contact-number">-</span>
             </div>
 
             <div class="actions">
                 <a href="#" class="button">Edit Customer</a>
                 <a href="#" class="button secondary-button">Back to Customers</a>
             </div>
-
         </section>
-
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const endpoint = '/api/customers';
+            const stateSections = {
+                loading: document.querySelector('[data-state="loading"]'),
+                error: document.querySelector('[data-state="error"]'),
+                notFound: document.querySelector('[data-state="not-found"]'),
+                success: document.querySelector('[data-state="success"]'),
+            };
+            const fields = {
+                id: document.getElementById('customer-id'),
+                name: document.getElementById('customer-name'),
+                contact_number: document.getElementById('customer-contact-number'),
+            };
+
+            function setState(stateName) {
+                Object.keys(stateSections).forEach(function (key) {
+                    if (stateSections[key]) {
+                        stateSections[key].hidden = key !== stateName;
+                    }
+                });
+            }
+
+            function getRecordId() {
+                const parts = window.location.pathname.split('/').filter(Boolean);
+                return parts.length ? parts[parts.length - 1] : '';
+            }
+
+            function renderCustomer(record) {
+                fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
+                fields.name.textContent = record && record.name ? record.name : 'N/A';
+                fields.contact_number.textContent = record && record.contact_number ? record.contact_number : 'N/A';
+            }
+
+            async function loadCustomer() {
+                const id = getRecordId();
+                setState('loading');
+
+                if (!id) {
+                    setState('notFound');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(endpoint + '/' + encodeURIComponent(id));
+                    const payload = await response.json().catch(function () {
+                        return null;
+                    });
+
+                    if (response.status === 404 || payload === null || payload.status !== 200 || !payload.data) {
+                        setState('notFound');
+                        return;
+                    }
+
+                    renderCustomer(payload.data);
+                    setState('success');
+                } catch (error) {
+                    setState('error');
+                }
+            }
+
+            const retryLink = document.querySelector('[data-retry="customer"]');
+            if (retryLink) {
+                retryLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    loadCustomer();
+                });
+            }
+
+            loadCustomer();
+        });
+    </script>
 </body>
 </html>

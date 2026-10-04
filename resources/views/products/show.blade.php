@@ -71,7 +71,8 @@
         .secondary-button {
             background: #6c757d;
         }
-                .state-message {
+
+        .state-message {
             background: white;
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -91,69 +92,147 @@
         .error-state {
             border-color: #dc3545;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
     <main class="container">
-
         <header class="header">
             <h1>Product Details</h1>
             <p class="description">
                 View the complete information for this product.
             </p>
         </header>
-                {{-- Empty State --}}
-        <section class="state-message" aria-label="Product not found">
+
+        <section class="state-message" data-state="not-found" aria-label="Product not found" hidden>
             <h2>Product not found</h2>
-            <p>The requested product record does not exist.</p>
+            <p>The requested product record was not found.</p>
             <a href="#" class="button secondary-button">Back to Products</a>
         </section>
 
-        {{-- Loading State --}}
-        <section class="state-message" aria-label="Loading product details">
+        <section class="state-message" data-state="loading" aria-label="Loading product details">
             <h2>Loading product details...</h2>
             <p>Please wait while the product information is being loaded.</p>
         </section>
 
-        {{-- Error State --}}
-        <section class="state-message error-state" aria-label="Product details error">
+        <section class="state-message error-state" data-state="error" aria-label="Product details error" hidden>
             <h2>Unable to load product</h2>
             <p>Something went wrong while loading this product's information.</p>
-            <a href="#" class="button">Try Again</a>
+            <a href="#" class="button" data-retry="product">Try Again</a>
         </section>
 
-        {{-- Normal Product Details --}}
-        
-        <section class="card" aria-label="Product details">
-
+        <section class="card" data-state="success" aria-label="Product details" hidden>
             <div class="detail-row">
                 <span class="label">Product ID</span>
-                <span>1</span>
+                <span id="product-id">-</span>
             </div>
 
             <div class="detail-row">
                 <span class="label">Product Name</span>
-                <span>5-Gallon Purified Water</span>
+                <span id="product-name">-</span>
             </div>
 
             <div class="detail-row">
                 <span class="label">Price</span>
-                <span>₱25.00</span>
+                <span id="product-price">-</span>
             </div>
 
             <div class="detail-row">
                 <span class="label">Stock</span>
-                <span>50</span>
+                <span id="product-stock">-</span>
             </div>
 
             <div class="actions">
                 <a href="#" class="button">Edit Product</a>
                 <a href="#" class="button secondary-button">Back to Products</a>
             </div>
-
         </section>
-
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const endpoint = '/api/products';
+            const stateSections = {
+                loading: document.querySelector('[data-state="loading"]'),
+                error: document.querySelector('[data-state="error"]'),
+                notFound: document.querySelector('[data-state="not-found"]'),
+                success: document.querySelector('[data-state="success"]'),
+            };
+            const fields = {
+                id: document.getElementById('product-id'),
+                name: document.getElementById('product-name'),
+                price: document.getElementById('product-price'),
+                stock: document.getElementById('product-stock'),
+            };
+
+            function setState(stateName) {
+                Object.keys(stateSections).forEach(function (key) {
+                    if (stateSections[key]) {
+                        stateSections[key].hidden = key !== stateName;
+                    }
+                });
+            }
+
+            function getRecordId() {
+                const parts = window.location.pathname.split('/').filter(Boolean);
+                return parts.length ? parts[parts.length - 1] : '';
+            }
+
+            function renderProduct(record) {
+                fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
+                fields.name.textContent = record && record.name ? record.name : 'N/A';
+
+                if (record && record.price !== undefined && record.price !== null) {
+                    const priceValue = Number(record.price);
+                    fields.price.textContent = Number.isFinite(priceValue) ? '₱' + priceValue.toFixed(2) : record.price;
+                } else {
+                    fields.price.textContent = 'N/A';
+                }
+
+                fields.stock.textContent = record && record.stock !== undefined && record.stock !== null ? record.stock : 'N/A';
+            }
+
+            async function loadProduct() {
+                const id = getRecordId();
+                setState('loading');
+
+                if (!id) {
+                    setState('notFound');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(endpoint + '/' + encodeURIComponent(id));
+                    const payload = await response.json().catch(function () {
+                        return null;
+                    });
+
+                    if (response.status === 404 || payload === null || payload.status !== 200 || !payload.data) {
+                        setState('notFound');
+                        return;
+                    }
+
+                    renderProduct(payload.data);
+                    setState('success');
+                } catch (error) {
+                    setState('error');
+                }
+            }
+
+            const retryLink = document.querySelector('[data-retry="product"]');
+            if (retryLink) {
+                retryLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    loadProduct();
+                });
+            }
+
+            loadProduct();
+        });
+    </script>
 </body>
 </html>

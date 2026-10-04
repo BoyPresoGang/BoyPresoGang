@@ -71,7 +71,8 @@
         .secondary-button {
             background: #6c757d;
         }
-                .state-message {
+
+        .state-message {
             background: white;
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -91,74 +92,140 @@
         .error-state {
             border-color: #dc3545;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
     <main class="container">
-
         <header class="header">
             <h1>Order Details</h1>
             <p class="description">
                 View the complete information for this customer order.
             </p>
         </header>
-                {{-- Empty State --}}
-        <section class="state-message" aria-label="Order not found">
+
+        <section class="state-message" data-state="not-found" aria-label="Order not found" hidden>
             <h2>Order not found</h2>
-            <p>The requested order record does not exist.</p>
+            <p>The requested order record was not found.</p>
             <a href="#" class="button secondary-button">Back to Orders</a>
         </section>
 
-        {{-- Loading State --}}
-        <section class="state-message" aria-label="Loading order details">
+        <section class="state-message" data-state="loading" aria-label="Loading order details">
             <h2>Loading order details...</h2>
             <p>Please wait while the order information is being loaded.</p>
         </section>
 
-        {{-- Error State --}}
-        <section class="state-message error-state" aria-label="Order details error">
+        <section class="state-message error-state" data-state="error" aria-label="Order details error" hidden>
             <h2>Unable to load order</h2>
             <p>Something went wrong while loading this order's information.</p>
-            <a href="#" class="button">Try Again</a>
+            <a href="#" class="button" data-retry="order">Try Again</a>
         </section>
 
-        {{-- Normal Order Details --}}
-
-        <section class="card" aria-label="Order details">
-
+        <section class="card" data-state="success" aria-label="Order details" hidden>
             <div class="detail-row">
                 <span class="label">Order ID</span>
-                <span>1</span>
+                <span id="order-id">-</span>
             </div>
 
             <div class="detail-row">
-                <span class="label">Customer</span>
-                <span>Juan Dela Cruz</span>
+                <span class="label">Customer ID</span>
+                <span id="order-customer-id">-</span>
             </div>
 
             <div class="detail-row">
-                <span class="label">Product</span>
-                <span>5-Gallon Purified Water</span>
+                <span class="label">Product ID</span>
+                <span id="order-product-id">-</span>
             </div>
 
             <div class="detail-row">
                 <span class="label">Quantity</span>
-                <span>3</span>
-            </div>
-
-            <div class="detail-row">
-                <span class="label">Status</span>
-                <span>Pending</span>
+                <span id="order-quantity">-</span>
             </div>
 
             <div class="actions">
                 <a href="#" class="button">Edit Order</a>
                 <a href="#" class="button secondary-button">Back to Orders</a>
             </div>
-
         </section>
-
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const endpoint = '/api/orders';
+            const stateSections = {
+                loading: document.querySelector('[data-state="loading"]'),
+                error: document.querySelector('[data-state="error"]'),
+                notFound: document.querySelector('[data-state="not-found"]'),
+                success: document.querySelector('[data-state="success"]'),
+            };
+            const fields = {
+                id: document.getElementById('order-id'),
+                customer_id: document.getElementById('order-customer-id'),
+                product_id: document.getElementById('order-product-id'),
+                quantity: document.getElementById('order-quantity'),
+            };
+
+            function setState(stateName) {
+                Object.keys(stateSections).forEach(function (key) {
+                    if (stateSections[key]) {
+                        stateSections[key].hidden = key !== stateName;
+                    }
+                });
+            }
+
+            function getRecordId() {
+                const parts = window.location.pathname.split('/').filter(Boolean);
+                return parts.length ? parts[parts.length - 1] : '';
+            }
+
+            function renderOrder(record) {
+                fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
+                fields.customer_id.textContent = record && record.customer_id !== undefined && record.customer_id !== null ? record.customer_id : 'N/A';
+                fields.product_id.textContent = record && record.product_id !== undefined && record.product_id !== null ? record.product_id : 'N/A';
+                fields.quantity.textContent = record && record.quantity !== undefined && record.quantity !== null ? record.quantity : 'N/A';
+            }
+
+            async function loadOrder() {
+                const id = getRecordId();
+                setState('loading');
+
+                if (!id) {
+                    setState('notFound');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(endpoint + '/' + encodeURIComponent(id));
+                    const payload = await response.json().catch(function () {
+                        return null;
+                    });
+
+                    if (response.status === 404 || payload === null || payload.status !== 200 || !payload.data) {
+                        setState('notFound');
+                        return;
+                    }
+
+                    renderOrder(payload.data);
+                    setState('success');
+                } catch (error) {
+                    setState('error');
+                }
+            }
+
+            const retryLink = document.querySelector('[data-retry="order"]');
+            if (retryLink) {
+                retryLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    loadOrder();
+                });
+            }
+
+            loadOrder();
+        });
+    </script>
 </body>
 </html>

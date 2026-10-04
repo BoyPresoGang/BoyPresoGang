@@ -71,7 +71,8 @@
         .secondary-button {
             background: #6c757d;
         }
-                .state-message {
+
+        .state-message {
             background: white;
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -91,74 +92,140 @@
         .error-state {
             border-color: #dc3545;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
     <main class="container">
-
         <header class="header">
             <h1>Delivery Details</h1>
             <p class="description">
                 View the complete information for this delivery.
             </p>
         </header>
-                {{-- Empty State --}}
-        <section class="state-message" aria-label="Delivery not found">
+
+        <section class="state-message" data-state="not-found" aria-label="Delivery not found" hidden>
             <h2>Delivery not found</h2>
-            <p>The requested delivery record does not exist.</p>
+            <p>The requested delivery record was not found.</p>
             <a href="#" class="button secondary-button">Back to Deliveries</a>
         </section>
 
-        {{-- Loading State --}}
-        <section class="state-message" aria-label="Loading delivery details">
+        <section class="state-message" data-state="loading" aria-label="Loading delivery details">
             <h2>Loading delivery details...</h2>
             <p>Please wait while the delivery information is being loaded.</p>
         </section>
 
-        {{-- Error State --}}
-        <section class="state-message error-state" aria-label="Delivery details error">
+        <section class="state-message error-state" data-state="error" aria-label="Delivery details error" hidden>
             <h2>Unable to load delivery</h2>
             <p>Something went wrong while loading this delivery's information.</p>
-            <a href="#" class="button">Try Again</a>
+            <a href="#" class="button" data-retry="delivery">Try Again</a>
         </section>
 
-        {{-- Normal Delivery Details --}}
-        
-        <section class="card" aria-label="Delivery details">
-
+        <section class="card" data-state="success" aria-label="Delivery details" hidden>
             <div class="detail-row">
                 <span class="label">Delivery ID</span>
-                <span>1</span>
+                <span id="delivery-id">-</span>
             </div>
 
             <div class="detail-row">
-                <span class="label">Order</span>
-                <span>#1001</span>
+                <span class="label">Customer ID</span>
+                <span id="delivery-customer-id">-</span>
             </div>
 
             <div class="detail-row">
-                <span class="label">Customer</span>
-                <span>Juan Dela Cruz</span>
-            </div>
-
-            <div class="detail-row">
-                <span class="label">Delivery Address</span>
-                <span>Maramag, Bukidnon</span>
+                <span class="label">Delivery Date</span>
+                <span id="delivery-date">-</span>
             </div>
 
             <div class="detail-row">
                 <span class="label">Status</span>
-                <span>Pending</span>
+                <span id="delivery-status">-</span>
             </div>
 
             <div class="actions">
                 <a href="#" class="button">Edit Delivery</a>
                 <a href="#" class="button secondary-button">Back to Deliveries</a>
             </div>
-
         </section>
-
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const endpoint = '/api/deliveries';
+            const stateSections = {
+                loading: document.querySelector('[data-state="loading"]'),
+                error: document.querySelector('[data-state="error"]'),
+                notFound: document.querySelector('[data-state="not-found"]'),
+                success: document.querySelector('[data-state="success"]'),
+            };
+            const fields = {
+                id: document.getElementById('delivery-id'),
+                customer_id: document.getElementById('delivery-customer-id'),
+                delivery_date: document.getElementById('delivery-date'),
+                status: document.getElementById('delivery-status'),
+            };
+
+            function setState(stateName) {
+                Object.keys(stateSections).forEach(function (key) {
+                    if (stateSections[key]) {
+                        stateSections[key].hidden = key !== stateName;
+                    }
+                });
+            }
+
+            function getRecordId() {
+                const parts = window.location.pathname.split('/').filter(Boolean);
+                return parts.length ? parts[parts.length - 1] : '';
+            }
+
+            function renderDelivery(record) {
+                fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
+                fields.customer_id.textContent = record && record.customer_id !== undefined && record.customer_id !== null ? record.customer_id : 'N/A';
+                fields.delivery_date.textContent = record && record.delivery_date ? record.delivery_date : 'N/A';
+                fields.status.textContent = record && record.status ? record.status : 'N/A';
+            }
+
+            async function loadDelivery() {
+                const id = getRecordId();
+                setState('loading');
+
+                if (!id) {
+                    setState('notFound');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(endpoint + '/' + encodeURIComponent(id));
+                    const payload = await response.json().catch(function () {
+                        return null;
+                    });
+
+                    if (response.status === 404 || payload === null || payload.status !== 200 || !payload.data) {
+                        setState('notFound');
+                        return;
+                    }
+
+                    renderDelivery(payload.data);
+                    setState('success');
+                } catch (error) {
+                    setState('error');
+                }
+            }
+
+            const retryLink = document.querySelector('[data-retry="delivery"]');
+            if (retryLink) {
+                retryLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    loadDelivery();
+                });
+            }
+
+            loadDelivery();
+        });
+    </script>
 </body>
 </html>

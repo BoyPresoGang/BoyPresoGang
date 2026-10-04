@@ -121,7 +121,7 @@
 
         <section class="state-message error-state" data-state="error" aria-label="Customer details error" hidden>
             <h2>Unable to load customer</h2>
-            <p>Something went wrong while loading this customer's information.</p>
+            <p data-error-message>The customer information could not be loaded. Please try again.</p>
             <a href="#" class="button" data-retry="customer">Try Again</a>
         </section>
 
@@ -162,6 +162,7 @@
                 name: document.getElementById('customer-name'),
                 contact_number: document.getElementById('customer-contact-number'),
             };
+            const errorMessage = document.querySelector('[data-error-message]');
 
             function setState(stateName) {
                 Object.keys(stateSections).forEach(function (key) {
@@ -169,6 +170,11 @@
                         stateSections[key].hidden = key !== stateName;
                     }
                 });
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                setState('error');
             }
 
             function getRecordId() {
@@ -191,22 +197,42 @@
                     return;
                 }
 
+                let response;
                 try {
-                    const response = await fetch(endpoint + '/' + encodeURIComponent(id));
-                    const payload = await response.json().catch(function () {
-                        return null;
-                    });
-
-                    if (response.status === 404 || payload === null || payload.status !== 200 || !payload.data) {
-                        setState('notFound');
-                        return;
-                    }
-
-                    renderCustomer(payload.data);
-                    setState('success');
+                    response = await fetch(endpoint + '/' + encodeURIComponent(id));
                 } catch (error) {
-                    setState('error');
+                    showError("We couldn't connect to the server. Check your connection and try again.");
+                    return;
                 }
+
+                if (response.status === 404) {
+                    setState('notFound');
+                    return;
+                }
+
+                if (!response.ok) {
+                    showError(response.status >= 500
+                        ? "The server is having trouble loading this customer's information. Please try again."
+                        : "We couldn't load this customer's information. Please try again.");
+                    return;
+                }
+
+                let payload;
+                try {
+                    payload = await response.json();
+                } catch (error) {
+                    showError("The server returned an unexpected response. Please try again.");
+                    return;
+                }
+
+                if (!payload || typeof payload !== 'object' || payload.status !== 200
+                    || !payload.data || typeof payload.data !== 'object' || Array.isArray(payload.data)) {
+                    showError("The server returned an unexpected response. Please try again.");
+                    return;
+                }
+
+                renderCustomer(payload.data);
+                setState('success');
             }
 
             const retryLink = document.querySelector('[data-retry="customer"]');

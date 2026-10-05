@@ -18,7 +18,7 @@ class CustomerController extends Controller
 
         return [
             'name' => "{$required}|string|min:2|max:100",
-            'contact_number' => "{$required}|string|min:7|max:20",
+            'contact_number' => "{$required}|string|regex:/^[0-9]{11}$/",
         ];
     }
 

@@ -191,13 +191,15 @@
                     </label>
 
                     <input
-                        type="tel"
+                        type="text"
                         id="contact_number"
                         name="contact_number"
                         placeholder="Enter contact number"
                         autocomplete="tel"
-                        minlength="7"
-                        maxlength="20"
+                        inputmode="numeric"
+                        pattern="[0-9]{11}"
+                        minlength="11"
+                        maxlength="11"
                         required
                         aria-required="true"
                         aria-describedby="contact_number-error"

@@ -1,3 +1,21 @@
+## Mark — Member 1 List-View API Binding
+
+### AI disclosure
+Work was AI-assisted. AI was used to inspect the existing resource list views, assist with binding the Customers, Products, Orders, and Deliveries views to their corresponding API endpoints, and assist with handling asynchronous loading, empty, error, and retry states.
+
+### Implemented changes
+- Bound the Customer list view to `/api/customers`.
+- Bound the Product list view to `/api/products`.
+- Bound the Order list view to `/api/orders`.
+- Bound the Delivery list view to `/api/deliveries`.
+- Added loading, empty, error, and retry handling for asynchronous list requests.
+- Preserved safe DOM rendering and the existing resource actions.
+
+### AI-use classification
+- API list bindings — **AI-modified**
+- Loading/empty/error/retry handling — **AI-assisted / AI-modified**
+- Existing resource structure and routes — **preserved**
+
 ## Abdul — Member 2 Detail-Page States/Error Handling
 
 AI assistance was used for Deliverable 3.
@@ -11,6 +29,26 @@ Changed:
 Testing: A Node-based harness with mocked `fetch()` responses and DOM elements exercised loading, successful field rendering, HTTP 404, HTTP 500, rejected fetch/network failure, an unusable data envelope, and retry after failure on all four detail views. `git diff --check` also passed.
 
 Testing limitations: These were simulated client-side checks only. No live browser session or API request was used, so real record data, actual backend 404/500 responses, and an actual connection failure were not verified.
+
+## Rommel — Member 3 Delete/Cancel Flows and Relationship Form Bindings
+
+### AI disclosure
+Work was AI-assisted. AI was used to assist with implementing and refining the resource delete/cancellation flows and with binding Order and Delivery relationship fields to API data.
+
+### Implemented changes
+- Added delete confirmation, loading, success, and error handling across Customers, Products, Orders, and Deliveries.
+- Added delivery cancellation handling.
+- Added handling for 403, 404, 422, 500, and network failures with human-readable feedback.
+- Added list refresh behavior after successful deletion or cancellation.
+- Bound Order Create customer and product selections to API data instead of hardcoded options.
+- Bound Delivery Create/Edit customer selections to API data.
+- Added loading, empty, and error states for relationship selectors.
+
+### AI-use classification
+- Delete/cancellation flow — **AI-assisted / AI-modified**
+- Relationship API bindings — **AI-assisted / AI-modified**
+- Existing backend authentication behavior — **preserved**
+
 ## Christian — Member 4 Create/Edit Verification
 
 ### AI disclosure
@@ -36,6 +74,25 @@ All eight Create/Edit Cancel actions were manually verified in the local applica
 - Order Edit → `/orders` — PASS
 - Delivery Create → `/deliveries` — PASS
 - Delivery Edit → `/deliveries` — PASS
+
+## Jerfrans — Feedback-State Documentation and Testing
+
+### AI disclosure
+Work was AI-assisted. AI was used to assist with documenting and reviewing the feedback-state coverage for Deliverable 3.
+
+### Implemented changes
+- Updated `docs/feedback-matrix.md`.
+- Updated `docs/feedback-tests.md`.
+- Documented loading, validation, not-found, server-error, network-error, and navigation feedback states relevant to the implemented interface.
+- Documented relationship-dropdown asynchronous states and detail-page navigation behavior.
+
+### Testing notes
+The updated feedback documentation records the applicable test coverage and identifies tests that had not been executed where applicable.
+
+### AI-use classification
+- Feedback documentation — **AI-assisted / AI-modified**
+- Feedback-state review — **AI-assisted**
+- Test execution claims — **not fabricated; documented according to the recorded testing status**
 
 ### Create/Edit testing
 

@@ -11,3 +11,89 @@ Changed:
 Testing: A Node-based harness with mocked `fetch()` responses and DOM elements exercised loading, successful field rendering, HTTP 404, HTTP 500, rejected fetch/network failure, an unusable data envelope, and retry after failure on all four detail views. `git diff --check` also passed.
 
 Testing limitations: These were simulated client-side checks only. No live browser session or API request was used, so real record data, actual backend 404/500 responses, and an actual connection failure were not verified.
+## Christian — Member 4 Create/Edit Verification
+
+### AI disclosure
+Work was AI-assisted. AI was used to inspect the existing Week 6–8 Create/Edit implementation, identify the known Cancel-navigation gap, make focused Cancel-navigation changes, and assist with test planning/documentation. Existing CRUD behavior and resource-specific fields/routes were preserved.
+
+### Implemented changes
+- Updated Create/Edit Cancel navigation for Customer, Product, Order, and Delivery.
+- Cancel actions now return to their corresponding resource list:
+  - Customer → `/customers`
+  - Product → `/products`
+  - Order → `/orders`
+  - Delivery → `/deliveries`
+- Existing Create/Edit loading, success, validation, and control-restoration behavior was preserved.
+- No Abdul detail-view files were modified for the Christian scope.
+
+### Cancel navigation verification
+All eight Create/Edit Cancel actions were manually verified in the local application:
+- Customer Create → `/customers` — PASS
+- Customer Edit → `/customers` — PASS
+- Product Create → `/products` — PASS
+- Product Edit → `/products` — PASS
+- Order Create → `/orders` — PASS
+- Order Edit → `/orders` — PASS
+- Delivery Create → `/deliveries` — PASS
+- Delivery Edit → `/deliveries` — PASS
+
+### Create/Edit testing
+
+#### Customer
+- Create successful submission — PASS; `201 Created`
+- Create loading feedback (`Saving...`) — PASS
+- Create success feedback and button restoration — PASS
+- Create validation — PASS; `422`
+- Edit existing data loaded — PASS
+- Edit successful update — PASS; `200 OK`
+- Edit loading feedback (`Updating...`) — PASS
+- Edit success feedback and button restoration — PASS
+- Edit validation — PASS; `422`
+
+#### Product
+- Create successful submission — PASS; `201 Created`
+- Create validation — PASS; `422`
+- Edit existing data loaded — PASS
+- Edit successful update — PASS; `200 OK`
+- Edit validation — PASS; `422`
+- Loading, success feedback, and control restoration were verified during the successful Create/Edit tests.
+
+#### Order
+- Create successful submission — PASS; `201 Created`
+- Create loading feedback (`Saving...`) — PASS
+- Create success feedback and button restoration — PASS
+- Create validation — PASS; `422`
+- Edit existing data loaded — PASS
+  - Customer ID: `1`
+  - Product ID: `2`
+  - Quantity: `10`
+- Edit successful update from quantity `10` to `2` — PASS; `200 OK`
+- Edit loading feedback (`Updating...`) — PASS
+- Edit success feedback and button restoration — PASS
+- Edit validation — PASS; `422`
+
+#### Delivery
+- Create successful submission — PASS; `201 Created`
+- Create loading feedback (`Saving...`) — PASS
+- Create success feedback and button restoration — PASS
+- Create validation — PASS; `422`
+- Edit existing data loaded — PASS
+  - Customer ID: `1`
+  - Delivery Date: `2026-10-13`
+  - Status: `delivered`
+- Edit successful update — PASS; `200 OK`
+- Edit loading feedback (`Updating...`) — PASS
+- Edit success feedback and button restoration — PASS
+- Edit validation — PASS; `422`
+
+### Validation notes
+Browser-native HTML validation was temporarily disabled during selected 422 API tests using the form `noValidate` property so that invalid data could reach the backend. Browser validation was restored to `false` after testing.
+
+### Scope limitations
+No 500/server-failure or network-failure UI test is claimed for the Christian Create/Edit scope. These were not fabricated as successful tests.
+
+### Evidence
+Testing was performed against the local Laravel application at `http://127.0.0.1:8000`. Network responses and visible UI feedback were manually checked during the Create/Edit verification.
+
+### Commit scope
+Christian changes are limited to the Create/Edit Cancel-navigation fixes and the related Deliverable 3 AI documentation. No unrelated CRUD rewrite was performed.

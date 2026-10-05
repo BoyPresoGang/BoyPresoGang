@@ -52,4 +52,19 @@ class ProductTest extends TestCase
         $response->assertStatus(422)
                  ->assertJsonPath('field', 'stock');
     }
+
+    /** @test */
+    public function test_store_rejects_non_positive_price() // Validation Failure
+    {
+        // Arrange
+        $payload = ['name' => 'Test Water', 'price' => 0, 'stock' => 10];
+
+        // Act
+        $response = $this->postJson('/api/products', $payload);
+
+        // Assert
+        $response->assertStatus(422)
+                 ->assertJsonPath('status', 422)
+                 ->assertJsonPath('field', 'price');
+    }
 }

@@ -332,6 +332,6 @@ Each member's Week 9 Task 1 work is intended to go through a reviewed pull reque
 
 - Mark — Order API validation improvement — PR #169 — merged after review.
 - Rommel — Delivery cancellation feedback improvement — PR #167 — merged after review.
-- Jerfrans — Order validation test coverage — PR #170 — awaiting review.
+- Jerfrans — Order validation test coverage — PR #170 — merged after review.
 - Abdul — Product List feedback-state improvement — completed and merged.
-- Christian — Customer List feedback-state improvement — PR #171 — conflict resolution in progress.
+- Christian — Customer List feedback-state improvement — PR #171 — merged after review.

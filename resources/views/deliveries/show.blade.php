@@ -132,8 +132,18 @@
             </div>
 
             <div class="detail-row">
-                <span class="label">Customer ID</span>
-                <span id="delivery-customer-id">-</span>
+                <span class="label">Customer</span>
+                <span id="delivery-customer-name">-</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="label">Product</span>
+                <span id="delivery-product-name">-</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="label">Quantity</span>
+                <span id="delivery-quantity">-</span>
             </div>
 
             <div class="detail-row">
@@ -164,7 +174,9 @@
             };
             const fields = {
                 id: document.getElementById('delivery-id'),
-                customer_id: document.getElementById('delivery-customer-id'),
+                customer_name: document.getElementById('delivery-customer-name'),
+                product_name: document.getElementById('delivery-product-name'),
+                quantity: document.getElementById('delivery-quantity'),
                 delivery_date: document.getElementById('delivery-date'),
                 status: document.getElementById('delivery-status'),
             };
@@ -190,8 +202,13 @@
             }
 
             function renderDelivery(record) {
+                const order = record && record.order;
                 fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
-                fields.customer_id.textContent = record && record.customer_id !== undefined && record.customer_id !== null ? record.customer_id : 'N/A';
+                fields.customer_name.textContent = order && order.customer && typeof order.customer.name === 'string'
+                    ? order.customer.name : (record.order_id ? 'N/A' : 'No associated order');
+                fields.product_name.textContent = order && order.product && typeof order.product.name === 'string'
+                    ? order.product.name : (record.order_id ? 'N/A' : 'No associated order');
+                fields.quantity.textContent = order && order.quantity !== undefined ? order.quantity : '—';
                 fields.delivery_date.textContent = record && record.delivery_date ? record.delivery_date : 'N/A';
                 fields.status.textContent = record && record.status ? record.status : 'N/A';
             }

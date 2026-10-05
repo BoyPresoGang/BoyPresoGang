@@ -204,6 +204,10 @@
                         <option value="">Select a product</option>
                     </select>
 
+                    <p id="product-stock" class="form-note" aria-live="polite">
+                        Select a product to see available stock.
+                    </p>
+
                     <div
                         id="product_id-error"
                         class="field-error"
@@ -263,6 +267,8 @@
         const productSelect = document.getElementById('product_id');
         const customerError = document.getElementById('customer_id-error');
         const productError = document.getElementById('product_id-error');
+        const productStock = document.getElementById('product-stock');
+        const quantityInput = document.getElementById('quantity');
 
         const fieldIds = [
             'customer_id',
@@ -308,6 +314,20 @@
         function clearLoadError(errorElement) {
             errorElement.textContent = '';
             errorElement.classList.remove('visible');
+        }
+
+        function updateProductStock() {
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            const stock = selectedOption ? Number(selectedOption.dataset.stock) : NaN;
+
+            if (!productSelect.value || !Number.isInteger(stock) || stock < 0) {
+                productStock.textContent = 'Select a product to see available stock.';
+                quantityInput.removeAttribute('max');
+                return;
+            }
+
+            productStock.textContent = 'Available stock: ' + stock;
+            quantityInput.max = String(stock);
         }
 
         async function loadCustomers() {
@@ -399,18 +419,25 @@
                     const option = document.createElement('option');
                     option.value = String(product.id);
                     option.textContent = product.name || 'Unnamed product';
+                    if (Number.isInteger(Number(product.stock)) && Number(product.stock) >= 0) {
+                        option.dataset.stock = String(product.stock);
+                    }
                     productSelect.append(option);
                 });
 
                 productSelect.disabled = payload.data.length === 0;
+                updateProductStock();
             } catch (error) {
                 setLoadingOption(productSelect, 'Unable to load products');
+                updateProductStock();
                 setLoadError(
                     productError,
                     'Unable to load products. Please try again.'
                 );
             }
         }
+
+        productSelect.addEventListener('change', updateProductStock);
 
         function showFieldError(fieldId, message) {
             const field = document.getElementById(fieldId);
@@ -483,6 +510,26 @@
                 )
             };
 
+            const selectedProduct = productSelect.options[productSelect.selectedIndex];
+            const availableStock = selectedProduct
+                ? Number(selectedProduct.dataset.stock)
+                : NaN;
+
+            if (Number.isInteger(availableStock)
+                && data.quantity > availableStock) {
+                showFieldError(
+                    'quantity',
+                    'The requested quantity exceeds the available stock.'
+                );
+                showMessage(
+                    'error',
+                    'Please correct the highlighted fields and try again.'
+                );
+                submitButton.disabled = false;
+                submitButton.textContent = 'Save Order';
+                return;
+            }
+
             try {
                 const response = await fetch('/api/orders', {
                     method: 'POST',
@@ -502,6 +549,7 @@
                     );
 
                     orderForm.reset();
+                    updateProductStock();
 
                 } else if (response.status === 422) {
                     const hasFieldErrors = showValidationErrors(result);

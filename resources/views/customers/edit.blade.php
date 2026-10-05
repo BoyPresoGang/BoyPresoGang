@@ -176,7 +176,7 @@ const customerSubmitButton =
     document.getElementById('submit-button');
 
 const customerId =
-    new URLSearchParams(window.location.search).get('id') || 1;
+    window.location.pathname.split('/').filter(Boolean).pop() || '';
 
 const customerFieldIds = ['name', 'contact_number'];
 

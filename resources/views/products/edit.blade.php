@@ -183,7 +183,7 @@ const productForm = document.getElementById('product-edit-form');
 const productSubmitButton = document.getElementById('submit-button');
 
 const productId =
-    new URLSearchParams(window.location.search).get('id') || 1;
+    window.location.pathname.split('/').filter(Boolean).pop() || '';
 
 const productFieldIds = ['name', 'price', 'stock'];
 

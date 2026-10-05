@@ -142,7 +142,7 @@
             </div>
 
             <div class="actions">
-                <a href="#" id="edit-customer-link" class="button">Edit Customer</a>
+                <a href="/customers" id="customer-edit-link" class="button">Edit Customer</a>
                 <a href="/customers" class="button secondary-button">Back to Customers</a>
             </div>
         </section>
@@ -163,6 +163,7 @@
                 contact_number: document.getElementById('customer-contact-number'),
             };
             const errorMessage = document.querySelector('[data-error-message]');
+            const editLink = document.getElementById('customer-edit-link');
 
             function setState(stateName) {
                 Object.keys(stateSections).forEach(function (key) {
@@ -182,8 +183,6 @@
                 return parts.length ? parts[parts.length - 1] : '';
             }
 
-            const editLink = document.getElementById('edit-customer-link');
-
             function renderCustomer(record) {
                 fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
                 fields.name.textContent = record && record.name ? record.name : 'N/A';
@@ -199,7 +198,9 @@
                     return;
                 }
 
-                editLink.href = '/customers/edit/' + encodeURIComponent(id);
+                if (editLink) {
+                    editLink.href = '/customers/edit/' + encodeURIComponent(id);
+                }
 
                 let response;
                 try {

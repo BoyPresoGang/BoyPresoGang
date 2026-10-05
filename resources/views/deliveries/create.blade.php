@@ -180,8 +180,6 @@
                         aria-describedby="customer_id-error"
                     >
                         <option value="">Select a customer</option>
-                        <option value="1">Juan Dela Cruz</option>
-                        <option value="2">Maria Santos</option>
                     </select>
 
                     <div
@@ -247,7 +245,7 @@
                         Save Delivery
                     </button>
 
-                    <a href="#" class="button secondary-button">
+                    <a href="/deliveries" class="button secondary-button">
                         Cancel
                     </a>
                 </div>
@@ -262,6 +260,8 @@
         const deliveryForm = document.getElementById('delivery-form');
         const submitButton = document.getElementById('submit-button');
         const formMessage = document.getElementById('form-message');
+        const customerSelect = document.getElementById('customer_id');
+        const customerError = document.getElementById('customer_id-error');
 
         const fieldIds = [
             'customer_id',
@@ -286,6 +286,68 @@
         function showMessage(type, message) {
             formMessage.className = 'message ' + type;
             formMessage.textContent = message;
+        }
+
+        function setLoadingOption(message) {
+            customerSelect.replaceChildren();
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = message;
+            option.selected = true;
+            option.disabled = true;
+            customerSelect.append(option);
+            customerSelect.disabled = true;
+        }
+
+        async function loadCustomers() {
+            customerError.textContent = '';
+            customerError.classList.remove('visible');
+            setLoadingOption('Loading customers...');
+
+            try {
+                const response = await fetch('/api/customers', {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('customer request failed');
+                }
+
+                const payload = await response.json();
+
+                if (!payload || payload.status !== 200 || !Array.isArray(payload.data)) {
+                    throw new Error('invalid customer response');
+                }
+
+                customerSelect.replaceChildren();
+
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = payload.data.length
+                    ? 'Select a customer'
+                    : 'No customers available';
+                placeholder.selected = true;
+                placeholder.disabled = payload.data.length === 0;
+                customerSelect.append(placeholder);
+
+                payload.data.forEach(function (customer) {
+                    if (!customer || customer.id === undefined || customer.id === null) {
+                        return;
+                    }
+
+                    const option = document.createElement('option');
+                    option.value = String(customer.id);
+                    option.textContent = customer.name || 'Unnamed customer';
+                    customerSelect.append(option);
+                });
+
+                customerSelect.disabled = payload.data.length === 0;
+            } catch (error) {
+                setLoadingOption('Unable to load customers');
+                customerError.textContent =
+                    'Unable to load customers. Please refresh and try again.';
+                customerError.classList.add('visible');
+            }
         }
 
         function showFieldError(fieldId, message) {
@@ -402,6 +464,8 @@
                 submitButton.textContent = 'Save Delivery';
             }
         });
+
+        loadCustomers();
     </script>
 
 </body>

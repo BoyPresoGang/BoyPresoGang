@@ -219,7 +219,7 @@
                         Save Customer
                     </button>
 
-                    <a href="#" class="button secondary-button">
+                    <a href="/customers" class="button secondary-button">
                         Cancel
                     </a>
                 </div>

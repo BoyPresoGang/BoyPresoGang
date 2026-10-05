@@ -180,8 +180,6 @@
                         aria-describedby="customer_id-error"
                     >
                         <option value="">Select a customer</option>
-                        <option value="1">Juan Dela Cruz</option>
-                        <option value="2">Maria Santos</option>
                     </select>
 
                     <div
@@ -204,8 +202,6 @@
                         aria-describedby="product_id-error"
                     >
                         <option value="">Select a product</option>
-                        <option value="1">5-Gallon Purified Water</option>
-                        <option value="2">5-Gallon Mineral Water</option>
                     </select>
 
                     <div
@@ -248,7 +244,7 @@
                         Save Order
                     </button>
 
-                    <a href="#" class="button secondary-button">
+                    <a href="/orders" class="button secondary-button">
                         Cancel
                     </a>
                 </div>
@@ -263,6 +259,10 @@
         const orderForm = document.getElementById('order-form');
         const submitButton = document.getElementById('submit-button');
         const formMessage = document.getElementById('form-message');
+        const customerSelect = document.getElementById('customer_id');
+        const productSelect = document.getElementById('product_id');
+        const customerError = document.getElementById('customer_id-error');
+        const productError = document.getElementById('product_id-error');
 
         const fieldIds = [
             'customer_id',
@@ -287,6 +287,129 @@
         function showMessage(type, message) {
             formMessage.className = 'message ' + type;
             formMessage.textContent = message;
+        }
+
+        function setLoadingOption(select, message) {
+            select.replaceChildren();
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = message;
+            option.selected = true;
+            option.disabled = true;
+            select.append(option);
+            select.disabled = true;
+        }
+
+        function setLoadError(errorElement, message) {
+            errorElement.textContent = message;
+            errorElement.classList.add('visible');
+        }
+
+        function clearLoadError(errorElement) {
+            errorElement.textContent = '';
+            errorElement.classList.remove('visible');
+        }
+
+        async function loadCustomers() {
+            clearLoadError(customerError);
+            setLoadingOption(customerSelect, 'Loading customers...');
+
+            try {
+                const response = await fetch('/api/customers', {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('customer request failed');
+                }
+
+                const payload = await response.json();
+
+                if (!payload || payload.status !== 200 || !Array.isArray(payload.data)) {
+                    throw new Error('invalid customer response');
+                }
+
+                customerSelect.replaceChildren();
+
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = payload.data.length
+                    ? 'Select a customer'
+                    : 'No customers available';
+                placeholder.selected = true;
+                placeholder.disabled = payload.data.length === 0;
+                customerSelect.append(placeholder);
+
+                payload.data.forEach(function (customer) {
+                    if (!customer || customer.id === undefined || customer.id === null) {
+                        return;
+                    }
+
+                    const option = document.createElement('option');
+                    option.value = String(customer.id);
+                    option.textContent = customer.name || 'Unnamed customer';
+                    customerSelect.append(option);
+                });
+
+                customerSelect.disabled = payload.data.length === 0;
+            } catch (error) {
+                setLoadingOption(customerSelect, 'Unable to load customers');
+                setLoadError(
+                    customerError,
+                    'Unable to load customers. Please try again.'
+                );
+            }
+        }
+
+        async function loadProducts() {
+            clearLoadError(productError);
+            setLoadingOption(productSelect, 'Loading products...');
+
+            try {
+                const response = await fetch('/api/products', {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('product request failed');
+                }
+
+                const payload = await response.json();
+
+                if (!payload || payload.status !== 200 || !Array.isArray(payload.data)) {
+                    throw new Error('invalid product response');
+                }
+
+                productSelect.replaceChildren();
+
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = payload.data.length
+                    ? 'Select a product'
+                    : 'No products available';
+                placeholder.selected = true;
+                placeholder.disabled = payload.data.length === 0;
+                productSelect.append(placeholder);
+
+                payload.data.forEach(function (product) {
+                    if (!product || product.id === undefined || product.id === null) {
+                        return;
+                    }
+
+                    const option = document.createElement('option');
+                    option.value = String(product.id);
+                    option.textContent = product.name || 'Unnamed product';
+                    productSelect.append(option);
+                });
+
+                productSelect.disabled = payload.data.length === 0;
+            } catch (error) {
+                setLoadingOption(productSelect, 'Unable to load products');
+                setLoadError(
+                    productError,
+                    'Unable to load products. Please try again.'
+                );
+            }
         }
 
         function showFieldError(fieldId, message) {
@@ -407,6 +530,9 @@
                 submitButton.textContent = 'Save Order';
             }
         });
+
+        loadCustomers();
+        loadProducts();
     </script>
 
 </body>

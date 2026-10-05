@@ -206,7 +206,7 @@
                         Update Order
                     </button>
 
-                    <a href="#" class="button secondary-button">
+                    <a href="/orders" class="button secondary-button">
                         Cancel
                     </a>
                 </div>

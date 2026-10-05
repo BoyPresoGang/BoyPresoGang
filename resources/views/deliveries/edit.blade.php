@@ -149,15 +149,15 @@
                         Customer ID <span class="required">*</span>
                     </label>
 
-                    <input
-                        type="number"
+                    <select
                         id="customer_id"
                         name="customer_id"
-                        min="1"
                         required
                         aria-required="true"
                         aria-describedby="customer_id-error"
                     >
+                        <option value="">Loading customers...</option>
+                    </select>
 
                     <p id="customer_id-error" class="field-error" role="alert"></p>
                 </div>
@@ -211,7 +211,7 @@
                         Update Delivery
                     </button>
 
-                    <a href="#" class="button secondary-button">
+                    <a href="/deliveries" class="button secondary-button">
                         Cancel
                     </a>
                 </div>
@@ -231,6 +231,9 @@
 
         const deliveryId =
             new URLSearchParams(window.location.search).get('id') || 1;
+
+        const customerSelect = document.getElementById('customer_id');
+        const customerError = document.getElementById('customer_id-error');
 
         const deliveryFieldIds = [
             'customer_id',
@@ -294,8 +297,71 @@
             return hasFieldErrors;
         }
 
+        function setCustomerLoading(message) {
+            customerSelect.replaceChildren();
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = message;
+            option.selected = true;
+            option.disabled = true;
+            customerSelect.append(option);
+            customerSelect.disabled = true;
+        }
+
+        async function loadCustomers() {
+            customerError.textContent = '';
+            customerError.classList.remove('visible');
+            setCustomerLoading('Loading customers...');
+
+            try {
+                const response = await fetch('/api/customers', {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('customer request failed');
+                }
+
+                const payload = await response.json();
+
+                if (!payload || payload.status !== 200 || !Array.isArray(payload.data)) {
+                    throw new Error('invalid customer response');
+                }
+
+                customerSelect.replaceChildren();
+
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = payload.data.length
+                    ? 'Select a customer'
+                    : 'No customers available';
+                placeholder.selected = true;
+                placeholder.disabled = payload.data.length === 0;
+                customerSelect.append(placeholder);
+
+                payload.data.forEach(function (customer) {
+                    if (!customer || customer.id === undefined || customer.id === null) {
+                        return;
+                    }
+
+                    const option = document.createElement('option');
+                    option.value = String(customer.id);
+                    option.textContent = customer.name || 'Unnamed customer';
+                    customerSelect.append(option);
+                });
+
+                customerSelect.disabled = payload.data.length === 0;
+            } catch (error) {
+                setCustomerLoading('Unable to load customers');
+                customerError.textContent =
+                    'Unable to load customers. Please refresh and try again.';
+                customerError.classList.add('visible');
+            }
+        }
+
         async function loadDelivery() {
             try {
+                await loadCustomers();
                 const response =
                     await fetch(`/api/deliveries/${deliveryId}`);
 

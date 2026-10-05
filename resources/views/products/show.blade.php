@@ -147,7 +147,7 @@
             </div>
 
             <div class="actions">
-                <a href="#" id="edit-product-link" class="button">Edit Product</a>
+                <a href="/products" id="product-edit-link" class="button">Edit Product</a>
                 <a href="/products" class="button secondary-button">Back to Products</a>
             </div>
         </section>
@@ -169,6 +169,7 @@
                 stock: document.getElementById('product-stock'),
             };
             const errorMessage = document.querySelector('[data-error-message]');
+            const editLink = document.getElementById('product-edit-link');
 
             function setState(stateName) {
                 Object.keys(stateSections).forEach(function (key) {
@@ -187,8 +188,6 @@
                 const parts = window.location.pathname.split('/').filter(Boolean);
                 return parts.length ? parts[parts.length - 1] : '';
             }
-
-            const editLink = document.getElementById('edit-product-link');
 
             function renderProduct(record) {
                 fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
@@ -213,7 +212,9 @@
                     return;
                 }
 
-                editLink.href = '/products/edit/' + encodeURIComponent(id);
+                if (editLink) {
+                    editLink.href = '/products/edit/' + encodeURIComponent(id);
+                }
 
                 let response;
                 try {

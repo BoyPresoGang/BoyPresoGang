@@ -80,4 +80,33 @@ class OrderTest extends TestCase
                  ->assertJsonPath('status', 422)
                  ->assertJsonPath('field', 'customer_id');
     }
+
+    /** @test */
+    public function test_store_rejects_quantity_above_product_stock() // Business Rule
+    {
+        // Arrange
+        $customer = Customer::create([
+            'name' => 'Order Customer',
+            'contact_number' => '09123456789',
+        ]);
+        $product = Product::create([
+            'name' => 'Limited Water',
+            'price' => 25.00,
+            'stock' => 1,
+        ]);
+        $payload = [
+            'customer_id' => $customer->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+        ];
+
+        // Act
+        $response = $this->postJson('/api/orders', $payload);
+
+        // Assert
+        $response->assertStatus(422)
+                 ->assertJsonPath('status', 422)
+                 ->assertJsonPath('field', 'quantity')
+                 ->assertJsonPath('error', 'The requested quantity exceeds the available stock.');
+    }
 }

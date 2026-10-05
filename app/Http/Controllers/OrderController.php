@@ -18,7 +18,7 @@ class OrderController extends Controller
         $required = $isUpdate ? 'sometimes' : 'required';
 
         return [
-            'customer_id' => "{$required}|integer",
+            'customer_id' => "{$required}|integer|exists:customers,id",
             'product_id' => "{$required}|integer",
             'quantity' => "{$required}|integer|gte:1",
         ];

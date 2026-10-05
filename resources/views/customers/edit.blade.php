@@ -156,7 +156,7 @@
                 Update Customer
             </button>
 
-            <a href="#" class="button secondary">
+            <a href="/customers" class="button secondary">
                 Cancel
             </a>
 

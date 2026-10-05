@@ -59,7 +59,8 @@
             font-size: 14px;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             box-sizing: border-box;
             padding: 10px 12px;
@@ -68,7 +69,8 @@
             font-size: 16px;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: 3px solid rgba(13, 110, 253, 0.25);
             border-color: #0d6efd;
         }
@@ -143,36 +145,40 @@
 
                 <div class="form-group">
                     <label for="customer_id">
-                        Customer ID <span class="required">*</span>
+                        Customer <span class="required">*</span>
                     </label>
 
-                    <input
-                        type="number"
+                    <select
                         id="customer_id"
                         name="customer_id"
-                        min="1"
                         required
                         aria-required="true"
                         aria-describedby="customer_id-error"
                     >
+                        <option value="">Loading customers...</option>
+                    </select>
 
                     <p id="customer_id-error" class="field-error" role="alert"></p>
                 </div>
 
                 <div class="form-group">
                     <label for="product_id">
-                        Product ID <span class="required">*</span>
+                        Product <span class="required">*</span>
                     </label>
 
-                    <input
-                        type="number"
+                    <select
                         id="product_id"
                         name="product_id"
-                        min="1"
                         required
                         aria-required="true"
                         aria-describedby="product_id-error"
                     >
+                        <option value="">Loading products...</option>
+                    </select>
+
+                    <p id="product-stock" class="form-note" aria-live="polite">
+                        Select a product to see available stock.
+                    </p>
 
                     <p id="product_id-error" class="field-error" role="alert"></p>
                 </div>
@@ -220,9 +226,15 @@
     <script>
         const orderForm = document.getElementById('order-edit-form');
         const orderSubmitButton = document.getElementById('submit-button');
+        const customerSelect = document.getElementById('customer_id');
+        const productSelect = document.getElementById('product_id');
+        const productStock = document.getElementById('product-stock');
+        const quantityInput = document.getElementById('quantity');
+        let originalProductId = '';
+        let originalQuantity = 0;
 
         const orderId =
-            new URLSearchParams(window.location.search).get('id') || 1;
+            window.location.pathname.split('/').filter(Boolean).pop() || '';
 
         const orderFieldIds = [
             'customer_id',
@@ -286,8 +298,104 @@
             return hasFieldErrors;
         }
 
+        function setSelectMessage(select, message) {
+            select.replaceChildren();
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = message;
+            option.selected = true;
+            select.append(option);
+            select.disabled = true;
+        }
+
+        function getAvailableStock() {
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            const stock = selectedOption ? Number(selectedOption.dataset.stock) : NaN;
+
+            if (!productSelect.value || !Number.isInteger(stock) || stock < 0) {
+                return NaN;
+            }
+
+            if (productSelect.value === originalProductId) {
+                return stock + originalQuantity;
+            }
+
+            return stock;
+        }
+
+        function updateProductStock() {
+            const availableStock = getAvailableStock();
+
+            if (!productSelect.value || !Number.isInteger(availableStock)
+                || availableStock < 0) {
+                productStock.textContent = 'Select a product to see available stock.';
+                quantityInput.removeAttribute('max');
+                return;
+            }
+
+            productStock.textContent = 'Available stock for this order: ' + availableStock;
+            quantityInput.max = String(availableStock);
+        }
+
+        function populateSelect(select, records, emptyMessage) {
+            select.replaceChildren();
+
+            if (!records.length) {
+                setSelectMessage(select, emptyMessage);
+                return;
+            }
+
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = 'Select an option';
+            placeholder.selected = true;
+            select.append(placeholder);
+
+            records.forEach((record) => {
+                const option = document.createElement('option');
+                option.value = String(record.id);
+                option.textContent = record.name;
+                if (select === productSelect && Number.isInteger(Number(record.stock))
+                    && Number(record.stock) >= 0) {
+                    option.dataset.stock = String(record.stock);
+                }
+                select.append(option);
+            });
+
+            select.disabled = false;
+        }
+
+        async function loadOptions(endpoint, select, label, emptyMessage) {
+            setSelectMessage(select, `Loading ${label}...`);
+
+            try {
+                const response = await fetch(endpoint);
+                if (!response.ok) {
+                    throw new Error(`Unable to load ${label}. Please try again.`);
+                }
+
+                const payload = await response.json();
+                if (!payload || payload.status !== 200 || !Array.isArray(payload.data)
+                    || payload.data.some(record => !record || record.id == null
+                        || typeof record.name !== 'string')) {
+                    throw new Error(`Unable to load ${label}. Please try again.`);
+                }
+
+                populateSelect(select, payload.data, emptyMessage);
+                return payload.data;
+            } catch (error) {
+                setSelectMessage(select, `Unable to load ${label}. Please refresh and try again.`);
+                throw error;
+            }
+        }
+
         async function loadOrder() {
             try {
+                const [customers, products] = await Promise.all([
+                    loadOptions('/api/customers', customerSelect, 'customers', 'No customers available'),
+                    loadOptions('/api/products', productSelect, 'products', 'No products available')
+                ]);
+
                 const response = await fetch(`/api/orders/${orderId}`);
 
                 if (!response.ok) {
@@ -296,11 +404,22 @@
 
                 const result = await response.json();
 
-                document.getElementById('customer_id').value =
+                if (!result || result.status !== 200 || !result.data || typeof result.data !== 'object') {
+                    throw new Error('Unable to load order.');
+                }
+
+                populateSelect(customerSelect, customers, 'No customers available');
+                populateSelect(productSelect, products, 'No products available');
+
+                customerSelect.value =
                     result.data.customer_id ?? '';
 
-                document.getElementById('product_id').value =
+                productSelect.value =
                     result.data.product_id ?? '';
+
+                originalProductId = String(result.data.product_id ?? '');
+                originalQuantity = Number(result.data.quantity ?? 0);
+                updateProductStock();
 
                 document.getElementById('quantity').value =
                     result.data.quantity ?? '';
@@ -335,6 +454,21 @@
                 quantity:
                     document.getElementById('quantity').value
             };
+
+            const availableStock = getAvailableStock();
+
+            if (Number.isInteger(availableStock)
+                && data.quantity > availableStock) {
+                showOrderFieldError(
+                    'quantity',
+                    'The requested quantity exceeds the available stock.'
+                );
+                document.getElementById('form-error').textContent =
+                    'Please correct the highlighted fields and try again.';
+                orderSubmitButton.disabled = false;
+                orderSubmitButton.textContent = 'Update Order';
+                return;
+            }
 
             try {
                 const response = await fetch(`/api/orders/${orderId}`, {
@@ -372,6 +506,8 @@
                 orderSubmitButton.textContent = 'Update Order';
             }
         });
+
+        productSelect.addEventListener('change', updateProductStock);
 
         loadOrder();
     </script>

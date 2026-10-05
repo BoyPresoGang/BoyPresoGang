@@ -145,21 +145,22 @@
                 </p>
 
                 <div class="form-group">
-                    <label for="customer_id">
-                        Customer ID <span class="required">*</span>
+                    <label for="order_id">
+                        Order <span class="required">*</span>
                     </label>
 
                     <select
-                        id="customer_id"
-                        name="customer_id"
+                        id="order_id"
+                        name="order_id"
                         required
                         aria-required="true"
-                        aria-describedby="customer_id-error"
+                        aria-describedby="order_id-error"
                     >
-                        <option value="">Loading customers...</option>
+                        <option value="">Loading orders...</option>
                     </select>
 
-                    <p id="customer_id-error" class="field-error" role="alert"></p>
+                    <p id="order-note" class="form-note" aria-live="polite"></p>
+                    <p id="order_id-error" class="field-error" role="alert"></p>
                 </div>
 
                 <div class="form-group">
@@ -230,13 +231,22 @@
             document.getElementById('submit-button');
 
         const deliveryId =
-            new URLSearchParams(window.location.search).get('id') || 1;
+            window.location.pathname.split('/').filter(Boolean).pop() || '';
 
-        const customerSelect = document.getElementById('customer_id');
-        const customerError = document.getElementById('customer_id-error');
+        const orderSelect = document.getElementById('order_id');
+        const orderError = document.getElementById('order_id-error');
+        const orderNote = document.getElementById('order-note');
+        const deliveryDateInput = document.getElementById('delivery_date');
+        const today = new Date();
+        const localToday = today.getFullYear() + '-' +
+            String(today.getMonth() + 1).padStart(2, '0') + '-' +
+            String(today.getDate()).padStart(2, '0');
+        deliveryDateInput.min = localToday;
+        let deliveryRecord = null;
+        let availableOrders = [];
 
         const deliveryFieldIds = [
-            'customer_id',
+            'order_id',
             'delivery_date',
             'status'
         ];
@@ -297,71 +307,85 @@
             return hasFieldErrors;
         }
 
-        function setCustomerLoading(message) {
-            customerSelect.replaceChildren();
+        function setOrderLoading(message) {
+            orderSelect.replaceChildren();
             const option = document.createElement('option');
             option.value = '';
             option.textContent = message;
             option.selected = true;
             option.disabled = true;
-            customerSelect.append(option);
-            customerSelect.disabled = true;
+            orderSelect.append(option);
+            orderSelect.disabled = true;
         }
 
-        async function loadCustomers() {
-            customerError.textContent = '';
-            customerError.classList.remove('visible');
-            setCustomerLoading('Loading customers...');
+        async function loadOrders(currentOrderId) {
+            orderError.textContent = '';
+            orderError.classList.remove('visible');
+            setOrderLoading('Loading orders...');
 
             try {
-                const response = await fetch('/api/customers', {
-                    headers: { 'Accept': 'application/json' }
-                });
+                const [ordersResponse, deliveriesResponse, customersResponse, productsResponse] = await Promise.all([
+                    fetch('/api/orders', { headers: { 'Accept': 'application/json' } }),
+                    fetch('/api/deliveries', { headers: { 'Accept': 'application/json' } }),
+                    fetch('/api/customers', { headers: { 'Accept': 'application/json' } }),
+                    fetch('/api/products', { headers: { 'Accept': 'application/json' } })
+                ]);
 
-                if (!response.ok) {
-                    throw new Error('customer request failed');
+                if (!ordersResponse.ok || !deliveriesResponse.ok || !customersResponse.ok || !productsResponse.ok) {
+                    throw new Error('order data request failed');
                 }
 
-                const payload = await response.json();
+                const [ordersPayload, deliveriesPayload, customersPayload, productsPayload] = await Promise.all([
+                    ordersResponse.json(), deliveriesResponse.json(), customersResponse.json(), productsResponse.json()
+                ]);
 
-                if (!payload || payload.status !== 200 || !Array.isArray(payload.data)) {
-                    throw new Error('invalid customer response');
+                if (!ordersPayload || ordersPayload.status !== 200 || !Array.isArray(ordersPayload.data)
+                    || !deliveriesPayload || deliveriesPayload.status !== 200 || !Array.isArray(deliveriesPayload.data)
+                    || !customersPayload || customersPayload.status !== 200 || !Array.isArray(customersPayload.data)
+                    || !productsPayload || productsPayload.status !== 200 || !Array.isArray(productsPayload.data)) {
+                    throw new Error('invalid order response');
                 }
 
-                customerSelect.replaceChildren();
+                const activeOrderIds = new Set(deliveriesPayload.data
+                    .filter(delivery => ['scheduled', 'in_transit'].includes(delivery.status)
+                        && delivery.order_id != null && String(delivery.id) !== String(deliveryId))
+                    .map(delivery => String(delivery.order_id)));
+                const customers = new Map(customersPayload.data.map(item => [String(item.id), item.name]));
+                const products = new Map(productsPayload.data.map(item => [String(item.id), item.name]));
+                availableOrders = ordersPayload.data.filter(order => order && order.id != null
+                    && (!activeOrderIds.has(String(order.id)) || String(order.id) === String(currentOrderId)));
+
+                orderSelect.replaceChildren();
 
                 const placeholder = document.createElement('option');
                 placeholder.value = '';
-                placeholder.textContent = payload.data.length
-                    ? 'Select a customer'
-                    : 'No customers available';
+                placeholder.textContent = availableOrders.length
+                    ? 'Select an order'
+                    : 'No orders are currently available for delivery.';
                 placeholder.selected = true;
-                placeholder.disabled = payload.data.length === 0;
-                customerSelect.append(placeholder);
+                placeholder.disabled = availableOrders.length === 0;
+                orderSelect.append(placeholder);
 
-                payload.data.forEach(function (customer) {
-                    if (!customer || customer.id === undefined || customer.id === null) {
-                        return;
-                    }
-
+                availableOrders.forEach(function (order) {
                     const option = document.createElement('option');
-                    option.value = String(customer.id);
-                    option.textContent = customer.name || 'Unnamed customer';
-                    customerSelect.append(option);
+                    option.value = String(order.id);
+                    option.textContent = (customers.get(String(order.customer_id)) || 'Customer unavailable') + ' — ' +
+                        (products.get(String(order.product_id)) || 'Product unavailable') + ' × ' + order.quantity;
+                    orderSelect.append(option);
                 });
 
-                customerSelect.disabled = payload.data.length === 0;
+                orderSelect.disabled = availableOrders.length === 0;
+                orderSelect.value = currentOrderId ? String(currentOrderId) : '';
             } catch (error) {
-                setCustomerLoading('Unable to load customers');
-                customerError.textContent =
-                    'Unable to load customers. Please refresh and try again.';
-                customerError.classList.add('visible');
+                setOrderLoading('Unable to load orders');
+                orderError.textContent =
+                    'Unable to load orders. Please refresh and try again.';
+                orderError.classList.add('visible');
             }
         }
 
         async function loadDelivery() {
             try {
-                await loadCustomers();
                 const response =
                     await fetch(`/api/deliveries/${deliveryId}`);
 
@@ -370,9 +394,15 @@
                 }
 
                 const result = await response.json();
-
-                document.getElementById('customer_id').value =
-                    result.data.customer_id ?? '';
+                deliveryRecord = result.data;
+                const currentOrderId = deliveryRecord.order_id ?? '';
+                await loadOrders(currentOrderId);
+                if (!currentOrderId) {
+                    orderNote.textContent =
+                        'This is a legacy delivery without an associated order. Select an order before saving.';
+                } else {
+                    orderNote.textContent = '';
+                }
 
                 document.getElementById('delivery_date').value =
                     result.data.delivery_date ?? '';
@@ -402,8 +432,8 @@
             clearDeliveryFieldErrors();
 
             const data = {
-                customer_id:
-                    document.getElementById('customer_id').value,
+                order_id:
+                    document.getElementById('order_id').value,
 
                 delivery_date:
                     document.getElementById('delivery_date').value,
@@ -411,6 +441,18 @@
                 status:
                     document.getElementById('status').value
             };
+
+            if (data.delivery_date && data.delivery_date < localToday) {
+                showDeliveryFieldError(
+                    'delivery_date',
+                    'The delivery date cannot be in the past.'
+                );
+                document.getElementById('form-error').textContent =
+                    'Please correct the highlighted fields and try again.';
+                deliverySubmitButton.disabled = false;
+                deliverySubmitButton.textContent = 'Update Delivery';
+                return;
+            }
 
             try {
                 const response =

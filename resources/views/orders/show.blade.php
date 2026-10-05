@@ -132,13 +132,13 @@
             </div>
 
             <div class="detail-row">
-                <span class="label">Customer ID</span>
-                <span id="order-customer-id">-</span>
+                <span class="label">Customer</span>
+                <span id="order-customer-name">-</span>
             </div>
 
             <div class="detail-row">
-                <span class="label">Product ID</span>
-                <span id="order-product-id">-</span>
+                <span class="label">Product</span>
+                <span id="order-product-name">-</span>
             </div>
 
             <div class="detail-row">
@@ -164,8 +164,8 @@
             };
             const fields = {
                 id: document.getElementById('order-id'),
-                customer_id: document.getElementById('order-customer-id'),
-                product_id: document.getElementById('order-product-id'),
+                customer_name: document.getElementById('order-customer-name'),
+                product_name: document.getElementById('order-product-name'),
                 quantity: document.getElementById('order-quantity'),
             };
             const errorMessage = document.querySelector('[data-error-message]');
@@ -189,10 +189,10 @@
                 return parts.length ? parts[parts.length - 1] : '';
             }
 
-            function renderOrder(record) {
+            function renderOrder(record, customer, product) {
                 fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
-                fields.customer_id.textContent = record && record.customer_id !== undefined && record.customer_id !== null ? record.customer_id : 'N/A';
-                fields.product_id.textContent = record && record.product_id !== undefined && record.product_id !== null ? record.product_id : 'N/A';
+                fields.customer_name.textContent = customer && typeof customer.name === 'string' ? customer.name : 'N/A';
+                fields.product_name.textContent = product && typeof product.name === 'string' ? product.name : 'N/A';
                 fields.quantity.textContent = record && record.quantity !== undefined && record.quantity !== null ? record.quantity : 'N/A';
             }
 
@@ -243,7 +243,43 @@
                     return;
                 }
 
-                renderOrder(payload.data);
+                if (payload.data.customer_id === undefined || payload.data.customer_id === null
+                    || payload.data.product_id === undefined || payload.data.product_id === null) {
+                    showError("The server returned an unexpected response. Please try again.");
+                    return;
+                }
+
+                let relatedResponses;
+                try {
+                    relatedResponses = await Promise.all([
+                        fetch('/api/customers/' + encodeURIComponent(payload.data.customer_id)),
+                        fetch('/api/products/' + encodeURIComponent(payload.data.product_id)),
+                    ]);
+                } catch (error) {
+                    showError("We couldn't connect to the server. Check your connection and try again.");
+                    return;
+                }
+
+                if (relatedResponses.some(response => !response.ok)) {
+                    showError("We couldn't load this order's customer or product information. Please try again.");
+                    return;
+                }
+
+                let relatedPayloads;
+                try {
+                    relatedPayloads = await Promise.all(relatedResponses.map(response => response.json()));
+                } catch (error) {
+                    showError("The server returned an unexpected response. Please try again.");
+                    return;
+                }
+
+                if (relatedPayloads.some(payload => !payload || payload.status !== 200
+                    || !payload.data || typeof payload.data !== 'object' || Array.isArray(payload.data))) {
+                    showError("The server returned an unexpected response. Please try again.");
+                    return;
+                }
+
+                renderOrder(payload.data, relatedPayloads[0].data, relatedPayloads[1].data);
                 setState('success');
             }
 

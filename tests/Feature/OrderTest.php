@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+use App\Models\Customer;
+use App\Models\Product;
+
 class OrderTest extends TestCase
 {
     use RefreshDatabase;
@@ -50,6 +53,31 @@ class OrderTest extends TestCase
 
         // Assert
         $response->assertStatus(422)
+                 ->assertJsonPath('field', 'customer_id');
+    }
+
+    /** @test */
+    public function test_store_rejects_nonexistent_customer_id() // Edge Case
+    {
+        // Arrange
+        $product = Product::create([
+            'name' => 'Test Water',
+            'price' => 25.00,
+            'stock' => 10,
+        ]);
+        $nonexistentCustomerId = (int) (Customer::max('id') ?? 0) + 1;
+        $payload = [
+            'customer_id' => $nonexistentCustomerId,
+            'product_id' => $product->id,
+            'quantity' => 1,
+        ];
+
+        // Act
+        $response = $this->postJson('/api/orders', $payload);
+
+        // Assert
+        $response->assertStatus(422)
+                 ->assertJsonPath('status', 422)
                  ->assertJsonPath('field', 'customer_id');
     }
 }

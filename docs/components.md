@@ -171,3 +171,15 @@ The shared components follow these principles:
 The shared components support the Week 6 requirement to break wireframes into reusable pieces and compose screens from those pieces.
 
 The components are currently designed for static Blade views using placeholder/sample data. Real backend data binding and interactive form submission will be handled in the following development phase.
+
+---
+
+# Implementation Attribution
+
+The shared Blade UI components documented in this file were implemented as part of the Week 6 shared-component work.
+
+- **Contributor:** Jerfrans
+- **Related work:** Shared Blade UI Components
+- **Commits:** `2b79549`, `d8cd385`
+
+The repository history verifies the implementation commits, but does not by itself establish whether each component was AI-generated, AI-modified, or hand-written. No unsupported AI attribution is made here.

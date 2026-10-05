@@ -111,7 +111,7 @@
         <section class="state-message" data-state="not-found" aria-label="Customer not found" hidden>
             <h2>Customer not found</h2>
             <p>The requested customer record was not found.</p>
-            <a href="#" class="button secondary-button">Back to Customers</a>
+            <a href="/customers" class="button secondary-button">Back to Customers</a>
         </section>
 
         <section class="state-message" data-state="loading" aria-label="Loading customer details">
@@ -142,8 +142,8 @@
             </div>
 
             <div class="actions">
-                <a href="#" class="button">Edit Customer</a>
-                <a href="#" class="button secondary-button">Back to Customers</a>
+                <a href="#" id="edit-customer-link" class="button">Edit Customer</a>
+                <a href="/customers" class="button secondary-button">Back to Customers</a>
             </div>
         </section>
     </main>
@@ -182,6 +182,8 @@
                 return parts.length ? parts[parts.length - 1] : '';
             }
 
+            const editLink = document.getElementById('edit-customer-link');
+
             function renderCustomer(record) {
                 fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
                 fields.name.textContent = record && record.name ? record.name : 'N/A';
@@ -196,6 +198,8 @@
                     setState('notFound');
                     return;
                 }
+
+                editLink.href = '/customers/edit/' + encodeURIComponent(id);
 
                 let response;
                 try {

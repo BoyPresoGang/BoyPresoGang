@@ -111,7 +111,7 @@
         <section class="state-message" data-state="not-found" aria-label="Delivery not found" hidden>
             <h2>Delivery not found</h2>
             <p>The requested delivery record was not found.</p>
-            <a href="#" class="button secondary-button">Back to Deliveries</a>
+            <a href="/deliveries" class="button secondary-button">Back to Deliveries</a>
         </section>
 
         <section class="state-message" data-state="loading" aria-label="Loading delivery details">
@@ -147,8 +147,8 @@
             </div>
 
             <div class="actions">
-                <a href="#" class="button">Edit Delivery</a>
-                <a href="#" class="button secondary-button">Back to Deliveries</a>
+                <a href="#" id="edit-delivery-link" class="button">Edit Delivery</a>
+                <a href="/deliveries" class="button secondary-button">Back to Deliveries</a>
             </div>
         </section>
     </main>
@@ -188,6 +188,8 @@
                 return parts.length ? parts[parts.length - 1] : '';
             }
 
+            const editLink = document.getElementById('edit-delivery-link');
+
             function renderDelivery(record) {
                 fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
                 fields.customer_id.textContent = record && record.customer_id !== undefined && record.customer_id !== null ? record.customer_id : 'N/A';
@@ -203,6 +205,8 @@
                     setState('notFound');
                     return;
                 }
+
+                editLink.href = '/deliveries/edit/' + encodeURIComponent(id);
 
                 let response;
                 try {

@@ -111,7 +111,7 @@
         <section class="state-message" data-state="not-found" aria-label="Order not found" hidden>
             <h2>Order not found</h2>
             <p>The requested order record was not found.</p>
-            <a href="#" class="button secondary-button">Back to Orders</a>
+            <a href="/orders" class="button secondary-button">Back to Orders</a>
         </section>
 
         <section class="state-message" data-state="loading" aria-label="Loading order details">
@@ -147,8 +147,8 @@
             </div>
 
             <div class="actions">
-                <a href="#" class="button">Edit Order</a>
-                <a href="#" class="button secondary-button">Back to Orders</a>
+                <a href="#" id="edit-order-link" class="button">Edit Order</a>
+                <a href="/orders" class="button secondary-button">Back to Orders</a>
             </div>
         </section>
     </main>
@@ -188,6 +188,8 @@
                 return parts.length ? parts[parts.length - 1] : '';
             }
 
+            const editLink = document.getElementById('edit-order-link');
+
             function renderOrder(record) {
                 fields.id.textContent = record && record.id !== undefined && record.id !== null ? record.id : 'N/A';
                 fields.customer_id.textContent = record && record.customer_id !== undefined && record.customer_id !== null ? record.customer_id : 'N/A';
@@ -203,6 +205,8 @@
                     setState('notFound');
                     return;
                 }
+
+                editLink.href = '/orders/edit/' + encodeURIComponent(id);
 
                 let response;
                 try {

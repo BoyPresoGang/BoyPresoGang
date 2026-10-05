@@ -16,10 +16,10 @@
 <body>
 <main class="container">
     <header class="header"><div><h1>Customers</h1><p class="description">Manage customers registered in the water refilling station.</p></div><a href="/customers/create" class="button">Add Customer</a></header>
-    <section id="action-feedback" class="state-message" aria-live="polite" hidden><p id="action-message"></p><button id="retry-delete" type="button" class="button" hidden>Try Delete Again</button></section>
-    <section id="loading-state" class="state-message" aria-label="Loading customer list"><h2>Loading customers...</h2><p>Please wait while the customer records are being loaded.</p></section>
-    <section id="empty-state" class="state-message" aria-label="Empty customer list" hidden><h2>No customers yet</h2><p>There are currently no customers registered in the system.</p><a href="/customers/create" class="button">Add Customer</a></section>
-    <section id="error-state" class="state-message error-state" aria-label="Customer list error" hidden><h2>Unable to load customers</h2><p id="error-message">Something went wrong while loading the customer records.</p><button id="try-again" type="button" class="button">Try Again</button></section>
+    <section id="action-feedback" class="state-message" role="status" aria-live="polite" hidden><p id="action-message"></p><button id="retry-delete" type="button" class="button" hidden>Try Delete Again</button></section>
+    <section id="loading-state" class="state-message" role="status" aria-live="polite" aria-busy="true" aria-label="Loading customer list"><h2>Loading customers...</h2><p>Please wait while the customer records are being loaded.</p></section>
+    <section id="empty-state" class="state-message" role="status" aria-live="polite" aria-label="Empty customer list" hidden><h2>No customers yet</h2><p>There are currently no customers registered in the system.</p><a href="/customers/create" class="button">Add Customer</a></section>
+    <section id="error-state" class="state-message error-state" role="alert" aria-label="Customer list error" hidden><h2>Unable to load customers</h2><p id="error-message">Something went wrong while loading the customer records.</p><button id="try-again" type="button" class="button">Try Again</button></section>
     <section id="list-state" class="table-container" aria-label="Customer list" hidden><table><thead><tr><th>ID</th><th>Name</th><th>Contact Number</th><th>Actions</th></tr></thead><tbody id="customer-rows"></tbody></table></section>
 </main>
 <script src="/js/demo-authorization.js"></script>

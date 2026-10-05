@@ -1,4 +1,6 @@
-AI assistance was used for Deliverable 3, ## Abdul — Member 2 Detail-Page States/Error Handling.
+## Abdul — Member 2 Detail-Page States/Error Handling
+
+AI assistance was used for Deliverable 3.
 
 Purpose: Correct the detail views so HTTP 404 responses remain distinct from server errors, network failures, and unusable API responses, while preserving the existing detail rendering and retry behavior.
 

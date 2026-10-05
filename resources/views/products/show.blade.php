@@ -111,7 +111,7 @@
         <section class="state-message" data-state="not-found" aria-label="Product not found" hidden>
             <h2>Product not found</h2>
             <p>The requested product record was not found.</p>
-            <a href="#" class="button secondary-button">Back to Products</a>
+            <a href="/products" class="button secondary-button">Back to Products</a>
         </section>
 
         <section class="state-message" data-state="loading" aria-label="Loading product details">
@@ -147,8 +147,8 @@
             </div>
 
             <div class="actions">
-                <a href="#" class="button">Edit Product</a>
-                <a href="#" class="button secondary-button">Back to Products</a>
+                <a href="/products" id="product-edit-link" class="button">Edit Product</a>
+                <a href="/products" class="button secondary-button">Back to Products</a>
             </div>
         </section>
     </main>
@@ -169,6 +169,7 @@
                 stock: document.getElementById('product-stock'),
             };
             const errorMessage = document.querySelector('[data-error-message]');
+            const editLink = document.getElementById('product-edit-link');
 
             function setState(stateName) {
                 Object.keys(stateSections).forEach(function (key) {
@@ -209,6 +210,10 @@
                 if (!id) {
                     setState('notFound');
                     return;
+                }
+
+                if (editLink) {
+                    editLink.href = '/products/edit/' + encodeURIComponent(id);
                 }
 
                 let response;

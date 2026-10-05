@@ -111,7 +111,7 @@
         <section class="state-message" data-state="not-found" aria-label="Order not found" hidden>
             <h2>Order not found</h2>
             <p>The requested order record was not found.</p>
-            <a href="#" class="button secondary-button">Back to Orders</a>
+            <a href="/orders" class="button secondary-button">Back to Orders</a>
         </section>
 
         <section class="state-message" data-state="loading" aria-label="Loading order details">
@@ -147,8 +147,8 @@
             </div>
 
             <div class="actions">
-                <a href="#" class="button">Edit Order</a>
-                <a href="#" class="button secondary-button">Back to Orders</a>
+                <a href="/orders" id="order-edit-link" class="button">Edit Order</a>
+                <a href="/orders" class="button secondary-button">Back to Orders</a>
             </div>
         </section>
     </main>
@@ -169,6 +169,7 @@
                 quantity: document.getElementById('order-quantity'),
             };
             const errorMessage = document.querySelector('[data-error-message]');
+            const editLink = document.getElementById('order-edit-link');
 
             function setState(stateName) {
                 Object.keys(stateSections).forEach(function (key) {
@@ -202,6 +203,10 @@
                 if (!id) {
                     setState('notFound');
                     return;
+                }
+
+                if (editLink) {
+                    editLink.href = '/orders/edit/' + encodeURIComponent(id);
                 }
 
                 let response;

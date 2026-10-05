@@ -111,7 +111,7 @@
         <section class="state-message" data-state="not-found" aria-label="Customer not found" hidden>
             <h2>Customer not found</h2>
             <p>The requested customer record was not found.</p>
-            <a href="#" class="button secondary-button">Back to Customers</a>
+            <a href="/customers" class="button secondary-button">Back to Customers</a>
         </section>
 
         <section class="state-message" data-state="loading" aria-label="Loading customer details">
@@ -142,8 +142,8 @@
             </div>
 
             <div class="actions">
-                <a href="#" class="button">Edit Customer</a>
-                <a href="#" class="button secondary-button">Back to Customers</a>
+                <a href="/customers" id="customer-edit-link" class="button">Edit Customer</a>
+                <a href="/customers" class="button secondary-button">Back to Customers</a>
             </div>
         </section>
     </main>
@@ -163,6 +163,7 @@
                 contact_number: document.getElementById('customer-contact-number'),
             };
             const errorMessage = document.querySelector('[data-error-message]');
+            const editLink = document.getElementById('customer-edit-link');
 
             function setState(stateName) {
                 Object.keys(stateSections).forEach(function (key) {
@@ -195,6 +196,10 @@
                 if (!id) {
                     setState('notFound');
                     return;
+                }
+
+                if (editLink) {
+                    editLink.href = '/customers/edit/' + encodeURIComponent(id);
                 }
 
                 let response;

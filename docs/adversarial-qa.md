@@ -1,6 +1,6 @@
 # Week 10 Adversarial QA
 
-Assigned member: Abdul Cedick Khalid Kalaw  
+Assigned member: Abdul Cedick Khalid Kalaw
 Branch: `week10/adversarial-qa`
 
 This document records adversarial checks performed against the running local Laravel application. No production code was modified. Results are limited to behavior directly observed in the browser.

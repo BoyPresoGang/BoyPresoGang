@@ -109,4 +109,17 @@ class OrderTest extends TestCase
                  ->assertJsonPath('field', 'quantity')
                  ->assertJsonPath('error', 'The requested quantity exceeds the available stock.');
     }
+
+    /** @test */
+    public function test_order_create_uses_visible_stock_feedback_for_over_stock_quantity() // UI Regression
+    {
+        // Act
+        $response = $this->get('/orders/create');
+
+        // Assert
+        $response->assertOk()
+                 ->assertSee('The requested quantity exceeds the available stock.')
+                 ->assertSee("showFieldError(\n                    'quantity',")
+                 ->assertDontSee('quantityInput.max = String(stock);');
+    }
 }

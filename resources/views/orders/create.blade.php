@@ -327,7 +327,7 @@
             }
 
             productStock.textContent = 'Available stock: ' + stock;
-            quantityInput.max = String(stock);
+            quantityInput.removeAttribute('max');
         }
 
         async function loadCustomers() {

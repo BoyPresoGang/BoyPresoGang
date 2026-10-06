@@ -27,20 +27,7 @@ class CustomerController extends Controller
      */
     protected function validateOrFail(Request $request, bool $isUpdate = false)
     {
-        $validator = Validator::make($request->all(), $this->rules($isUpdate));
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $field = array_key_first($errors->toArray());
-
-            return response()->json([
-                'status' => 422,
-                'error' => $errors->first($field),
-                'field' => $field,
-            ], 422);
-        }
-
-        return $validator->validated();
+        return $this->validateRequest($request->all(), $this->rules($isUpdate));
     }
 
     public function listCustomers()

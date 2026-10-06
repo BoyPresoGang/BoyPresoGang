@@ -75,3 +75,32 @@ The deployed production application is available at:
 - The production `APP_KEY` is not included in this documentation.
 - Production credentials, secrets, and personal login information must not be committed to the repository or included in deployment documentation.
 - The SQLite database is stored on the persistent Railway Volume rather than ephemeral application storage.
+
+## 9. Week 11 Task 5 — Live Smoke Test
+
+The live smoke test was performed against:
+
+<https://boypresogang-production.up.railway.app/customers>
+
+This smoke test was performed by Jerfrans D. Guerbo as Week 11 Task 5.
+
+### Happy path
+
+- Create customer: PASS
+- View customer details: PASS
+- Edit customer: PASS
+- Delete customer: PASS
+- Confirmed the deleted customer no longer appeared in the customer list: PASS
+
+### Failure path
+
+- Client-side validation for a one-character customer name: PASS
+- Client-side validation for an invalid contact number format: PASS
+- Backend validation using `POST /api/customers` with an empty name and invalid contact number: PASS
+- Backend response: HTTP 422 Unprocessable Entity
+
+The backend validation response was:
+
+```json
+{"status":422,"error":"The name field is required.","field":"name"}
+```

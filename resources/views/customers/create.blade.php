@@ -306,6 +306,38 @@
             return hasFieldErrors;
         }
 
+        function handleInvalidInput(event) {
+            const input = event.target;
+
+            if (!input || !fieldIds.includes(input.id)) {
+                return;
+            }
+
+            if (input === customerForm.querySelector(':invalid')) {
+                clearMessages();
+            }
+
+            let message = 'Please enter a valid value.';
+
+            if (input.validity.valueMissing) {
+                message = 'Please enter a value.';
+            } else if (input.id === 'contact_number' && (
+                input.validity.patternMismatch ||
+                input.validity.tooShort ||
+                input.validity.tooLong
+            )) {
+                message = 'Please enter an 11-digit number.';
+            }
+
+            showFieldError(input.id, message);
+            showMessage(
+                'error',
+                'Please correct the highlighted fields and try again.'
+            );
+        }
+
+        customerForm.addEventListener('invalid', handleInvalidInput, true);
+
         customerForm.addEventListener('submit', async function (event) {
             event.preventDefault();
 

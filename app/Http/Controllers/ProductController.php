@@ -86,10 +86,10 @@ class ProductController extends Controller
 
     public function deleteProduct(Request $request, $id)
     {
-        if ($request->header('X-User-Role') !== 'manager') {
+        if (!$request->user() || !$request->user()->isAdmin()) {
             return response()->json([
                 'status' => 403,
-                'error' => 'Forbidden: Only managers can delete products',
+                'error' => 'Forbidden: Only admins can delete products',
                 'field' => 'authorization',
             ], 403);
         }

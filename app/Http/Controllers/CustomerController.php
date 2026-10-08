@@ -86,7 +86,7 @@ class CustomerController extends Controller
 
     public function deleteCustomer(Request $request, $id)
     {
-        if ($request->header('X-User-Role') !== 'admin') {
+        if (!$request->user() || !$request->user()->isAdmin()) {
             return response()->json([
                 'status' => 403,
                 'error' => 'Forbidden: Only admins can delete customers',

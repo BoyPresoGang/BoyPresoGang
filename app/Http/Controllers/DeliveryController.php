@@ -177,10 +177,10 @@ class DeliveryController extends Controller
 
     public function deleteDelivery(Request $request, $id)
     {
-        if ($request->header('X-User-Role') !== 'dispatcher') {
+        if (!$request->user() || !$request->user()->isAdmin()) {
             return response()->json([
                 'status' => 403,
-                'error' => 'Forbidden: Only dispatchers can cancel deliveries',
+                'error' => 'Forbidden: Only admins can cancel deliveries',
                 'field' => 'authorization',
             ], 403);
         }

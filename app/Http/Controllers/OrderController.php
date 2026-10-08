@@ -179,21 +179,18 @@ class OrderController extends Controller
 
     public function deleteOrder(Request $request, $id)
     {
-        $currentUserId = $request->header('X-User-Id');
+        if (!$request->user() || !$request->user()->isAdmin()) {
+            return response()->json([
+                'status' => 403,
+                'error' => 'Forbidden: Only admins can cancel orders',
+                'field' => 'authorization',
+            ], 403);
+        }
 
-        return DB::transaction(function () use ($id, $currentUserId) {
+        return DB::transaction(function () use ($id) {
             $order = Order::query()
                 ->lockForUpdate()
                 ->findOrFail($id);
-
-            if ($currentUserId === null
-                || (string) $order->customer_id !== (string) $currentUserId) {
-                return response()->json([
-                    'status' => 403,
-                    'error' => 'Forbidden: You can only cancel your own orders',
-                    'field' => 'authorization',
-                ], 403);
-            }
 
             $product = Product::query()
                 ->lockForUpdate()

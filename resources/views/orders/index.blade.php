@@ -1,24 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Orders</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 40px; background: #f8f9fa; color: #212529; } .container { max-width: 1100px; margin: 0 auto; } .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; } h1 { margin: 0; } .description { color: #6c757d; margin-top: 6px; } .button { display: inline-block; padding: 10px 16px; background: #212529; color: white; text-decoration: none; border: 0; border-radius: 6px; cursor: pointer; } .table-container, .state-message { background: white; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; } table { width: 100%; border-collapse: collapse; } th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #dee2e6; } th { background: #f1f3f5; font-weight: 600; } tr:last-child td { border-bottom: none; } .actions a, .actions button { margin-right: 10px; color: #212529; } .actions button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; text-decoration: underline; } .state-message { padding: 32px; margin-bottom: 20px; text-align: center; } .state-message h2 { margin-top: 0; } .state-message p { color: #6c757d; } .error-state { border-color: #dc3545; }
-    </style>
-</head>
-<body><main class="container">
-    <header class="header"><div><h1>Orders</h1><p class="description">View and manage customer orders for water products.</p></div><a href="/orders/create" class="button">Create Order</a></header>
-    <section id="action-feedback" class="state-message" aria-live="polite" hidden><p id="action-message"></p><button id="retry-delete" type="button" class="button" hidden>Try Delete Again</button></section>
-    <section id="loading-state" class="state-message" aria-label="Loading order list"><h2>Loading orders...</h2><p>Please wait while the order records are being loaded.</p></section>
-    <section id="empty-state" class="state-message" aria-label="Empty order list" hidden><h2>No orders yet</h2><p>There are currently no orders registered in the system.</p><a href="/orders/create" class="button">Create Order</a></section>
-    <section id="error-state" class="state-message error-state" aria-label="Order list error" hidden><h2>Unable to load orders</h2><p id="error-message">Something went wrong while loading the order records.</p><button id="try-again" type="button" class="button">Try Again</button></section>
-    <section id="list-state" class="table-container" aria-label="Order list" hidden><table><thead><tr><th>ID</th><th>Customer</th><th>Product</th><th>Quantity</th><th>Actions</th></tr></thead><tbody id="order-rows"></tbody></table></section>
-</main><script src="/js/demo-authorization.js"></script><script>
+@extends('layouts.app')
+
+@section('title', 'Orders')
+
+@section('content')
+<div class="container">
+    <header class="header">
+        <div>
+            <h1>Orders</h1>
+            <p class="description">View and manage customer orders for water products.</p>
+        </div>
+        <a href="/orders/create" class="button">Create Order</a>
+    </header>
+
+    <section id="action-feedback" class="state-message" aria-live="polite" hidden>
+        <p id="action-message"></p>
+        <button id="retry-delete" type="button" class="button" hidden>Try Delete Again</button>
+    </section>
+
+    <section id="loading-state" class="state-message" aria-label="Loading order list">
+        <h2>Loading orders...</h2>
+        <p>Please wait while the order records are being loaded.</p>
+    </section>
+
+    <section id="empty-state" class="state-message" aria-label="Empty order list" hidden>
+        <h2>No orders yet</h2>
+        <p>There are currently no orders registered in the system.</p>
+        <a href="/orders/create" class="button">Create Order</a>
+    </section>
+
+    <section id="error-state" class="state-message error-state" aria-label="Order list error" hidden>
+        <h2>Unable to load orders</h2>
+        <p id="error-message">Something went wrong while loading the order records.</p>
+        <button id="try-again" type="button" class="button">Try Again</button>
+    </section>
+
+    <section id="list-state" class="table-container" aria-label="Order list" hidden>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="order-rows"></tbody>
+        </table>
+    </section>
+</div>
+
+<script>
 const states = { loading: document.getElementById('loading-state'), empty: document.getElementById('empty-state'), error: document.getElementById('error-state'), list: document.getElementById('list-state') }, rows = document.getElementById('order-rows'), errorMessage = document.getElementById('error-message'), feedback = document.getElementById('action-feedback'), actionMessage = document.getElementById('action-message'), retryDelete = document.getElementById('retry-delete');
 function showState(name) { Object.entries(states).forEach(([key, element]) => { element.hidden = key !== name; }); } function cell(value) { const e = document.createElement('td'); e.textContent = value == null ? '' : String(value); return e; } function actions(order) { const e = document.createElement('td'); e.className = 'actions'; [['View', '/orders/'], ['Edit', '/orders/edit/']].forEach(([label, path]) => { const a = document.createElement('a'); a.href = path + encodeURIComponent(String(order.id)); a.textContent = label; e.append(a); }); const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'Delete'; remove.addEventListener('click', () => deleteOrder(order.id, order.customer_id, remove)); e.append(remove); return e; }
 function feedbackMessage(message, canRetry, retry) { actionMessage.textContent = message; retryDelete.hidden = !canRetry; retryDelete.onclick = retry || null; feedback.hidden = false; }
 function requestError(status) { if (status === 403) return 'You are not authorized to cancel this order.'; if (status === 404) return 'This order was not found. Refresh the list and try again.'; if (status === 422) return 'The cancel request was invalid.'; if (status >= 500) return 'The server could not cancel this order. Please try again.'; return 'Unable to cancel this order. Please check your connection and try again.'; }
-async function deleteOrder(id, customerId, button) { if (!window.confirm('Cancel this order? This action cannot be undone.')) return; button.disabled = true; button.textContent = 'Cancelling...'; feedbackMessage('Cancelling order...', false); const retry = () => deleteOrder(id, customerId, button); try { const response = await fetch('/api/orders/' + encodeURIComponent(String(id)), { method: 'DELETE', headers: Object.assign({ Accept: 'application/json' }, window.demoAuthorization.headersFor('order', { customerId: customerId })) }); if (!response.ok) { feedbackMessage(requestError(response.status), true, retry); return; } feedbackMessage('Order cancelled successfully.', false); await loadOrders(); } catch (error) { feedbackMessage('Network error while cancelling the order.', true, retry); } finally { button.disabled = false; button.textContent = 'Delete'; } }
+async function deleteOrder(id, customerId, button) { if (!window.confirm('Cancel this order? This action cannot be undone.')) return; button.disabled = true; button.textContent = 'Cancelling...'; feedbackMessage('Cancelling order...', false); const retry = () => deleteOrder(id, customerId, button); try { const response = await fetch('/api/orders/' + encodeURIComponent(String(id)), { method: 'DELETE', headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' } }); if (!response.ok) { feedbackMessage(requestError(response.status), true, retry); return; } feedbackMessage('Order cancelled successfully.', false); await loadOrders(); } catch (error) { feedbackMessage('Network error while cancelling the order.', true, retry); } finally { button.disabled = false; button.textContent = 'Delete'; } }
 async function loadOrders() { showState('loading'); try { const [ordersResponse, customersResponse, productsResponse] = await Promise.all([fetch('/api/orders', { headers: { Accept: 'application/json' } }), fetch('/api/customers', { headers: { Accept: 'application/json' } }), fetch('/api/products', { headers: { Accept: 'application/json' } })]); if (!ordersResponse.ok) throw new Error('The order service returned an error.'); if (!customersResponse.ok || !productsResponse.ok) throw new Error('Unable to load customer and product names.'); const [ordersPayload, customersPayload, productsPayload] = await Promise.all([ordersResponse.json(), customersResponse.json(), productsResponse.json()]); if (!ordersPayload || !Array.isArray(ordersPayload.data) || ordersPayload.data.some(item => !item || item.id == null)) throw new Error('The order service returned an invalid response.'); if (!customersPayload || customersPayload.status !== 200 || !Array.isArray(customersPayload.data) || customersPayload.data.some(item => !item || item.id == null || typeof item.name !== 'string')) throw new Error('Unable to load customer names.'); if (!productsPayload || productsPayload.status !== 200 || !Array.isArray(productsPayload.data) || productsPayload.data.some(item => !item || item.id == null || typeof item.name !== 'string')) throw new Error('Unable to load product names.'); const customerNames = new Map(customersPayload.data.map(customer => [String(customer.id), customer.name])); const productNames = new Map(productsPayload.data.map(product => [String(product.id), product.name])); rows.replaceChildren(); ordersPayload.data.forEach(order => { const row = document.createElement('tr'); row.append(cell(order.id), cell(customerNames.get(String(order.customer_id)) || 'Customer unavailable'), cell(productNames.get(String(order.product_id)) || 'Product unavailable'), cell(order.quantity), actions(order)); rows.append(row); }); showState(ordersPayload.data.length ? 'list' : 'empty'); } catch (error) { errorMessage.textContent = error instanceof Error ? error.message : 'Please try again later.'; showState('error'); } }
 document.getElementById('try-again').addEventListener('click', loadOrders); loadOrders();
-</script></body></html>
+</script>
+@endsection

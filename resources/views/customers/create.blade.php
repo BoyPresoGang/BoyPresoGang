@@ -1,405 +1,243 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Customer</title>
+@extends('layouts.app')
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 40px;
-            background: #f8f9fa;
-            color: #212529;
-        }
+@section('title', 'Create Customer')
 
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .header {
-            margin-bottom: 24px;
-        }
-
-        h1 {
-            margin: 0;
-        }
-
-        .description {
-            color: #6c757d;
-            margin-top: 6px;
-        }
-
-        .card {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 28px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .required {
-            color: #b02a37;
-        }
-
-        .form-note {
-            margin-bottom: 20px;
-            color: #6c757d;
-            font-size: 14px;
-        }
-
-        .field-error {
-            display: block;
-            margin-top: 6px;
-            color: #b02a37;
-            font-size: 14px;
-        }
-
-        .form-message {
-            margin-bottom: 20px;
-            padding: 12px 14px;
-            border-radius: 6px;
-            display: none;
-        }
-
-        .form-message.success {
-            display: block;
-            background: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .form-message.error {
-            display: block;
-            background: #f8d7da;
-            color: #842029;
-        }
-
-        input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 10px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        input:focus {
-            outline: 3px solid rgba(13, 110, 253, 0.25);
-            border-color: #0d6efd;
-        }
-
-        input[aria-invalid="true"] {
-            border-color: #b02a37;
-        }
-
-        .actions {
-            margin-top: 24px;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 10px 16px;
-            background: #212529;
-            color: white;
-            border: none;
-            text-decoration: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-right: 8px;
-        }
-
-        .button:focus {
-            outline: 3px solid rgba(13, 110, 253, 0.25);
-            outline-offset: 2px;
-        }
-
-        .button:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-
-        .secondary-button {
-            background: #6c757d;
-        }
-    </style>
-</head>
-
-<body>
-    <main class="container">
-
-        <header class="header">
+@section('content')
+<div class="container container-narrow">
+    <header class="header">
+        <div>
             <h1>Create Customer</h1>
-            <p class="description">
-                Add a new customer to the water refilling station.
+            <p class="description">Add a new customer to the water refilling station.</p>
+        </div>
+    </header>
+
+    <section class="card" aria-label="Create customer form">
+        <div id="form-message" class="form-message" role="alert" aria-live="polite"></div>
+
+        <form id="customer-form" action="#" method="POST">
+            <p class="form-note">
+                <span class="required">*</span> Required fields
             </p>
-        </header>
 
-        <section class="card" aria-label="Create customer form">
+            <div class="form-group">
+                <label for="name">
+                    Customer Name <span class="required">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Enter customer name"
+                    autocomplete="name"
+                    minlength="2"
+                    maxlength="100"
+                    required
+                    aria-required="true"
+                    aria-describedby="name-error"
+                >
+                <span id="name-error" class="field-error" aria-live="polite"></span>
+            </div>
 
-            <div
-                id="form-message"
-                class="form-message"
-                role="alert"
-                aria-live="polite"
-            ></div>
+            <div class="form-group">
+                <label for="contact_number">
+                    Contact Number <span class="required">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="contact_number"
+                    name="contact_number"
+                    placeholder="Enter contact number"
+                    autocomplete="tel"
+                    inputmode="numeric"
+                    pattern="[0-9]{11}"
+                    minlength="11"
+                    maxlength="11"
+                    required
+                    aria-required="true"
+                    aria-describedby="contact_number-error"
+                >
+                <span id="contact_number-error" class="field-error" aria-live="polite"></span>
+            </div>
 
-            <form id="customer-form" action="#" method="POST">
+            <div class="actions" style="margin-top: 24px;">
+                <button type="submit" id="submit-button" class="button">
+                    Save Customer
+                </button>
+                <a href="/customers" class="button secondary-button">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </section>
+</div>
 
-                <p class="form-note">
-                    <span class="required">*</span> Required fields
-                </p>
+<script>
+    const customerForm = document.getElementById('customer-form');
+    const submitButton = document.getElementById('submit-button');
+    const formMessage = document.getElementById('form-message');
 
-                <div class="form-group">
-                    <label for="name">
-                        Customer Name <span class="required">*</span>
-                    </label>
+    const fieldIds = [
+        'name',
+        'contact_number'
+    ];
 
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Enter customer name"
-                        autocomplete="name"
-                        minlength="2"
-                        maxlength="100"
-                        required
-                        aria-required="true"
-                        aria-describedby="name-error"
-                    >
+    function clearMessages() {
+        formMessage.textContent = '';
+        formMessage.className = 'form-message';
 
-                    <span
-                        id="name-error"
-                        class="field-error"
-                        aria-live="polite"
-                    ></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="contact_number">
-                        Contact Number <span class="required">*</span>
-                    </label>
-
-                    <input
-                        type="text"
-                        id="contact_number"
-                        name="contact_number"
-                        placeholder="Enter contact number"
-                        autocomplete="tel"
-                        inputmode="numeric"
-                        pattern="[0-9]{11}"
-                        minlength="11"
-                        maxlength="11"
-                        required
-                        aria-required="true"
-                        aria-describedby="contact_number-error"
-                    >
-
-                    <span
-                        id="contact_number-error"
-                        class="field-error"
-                        aria-live="polite"
-                    ></span>
-                </div>
-
-                <div class="actions">
-                    <button
-                        type="submit"
-                        id="submit-button"
-                        class="button"
-                    >
-                        Save Customer
-                    </button>
-
-                    <a href="/customers" class="button secondary-button">
-                        Cancel
-                    </a>
-                </div>
-
-            </form>
-
-        </section>
-
-    </main>
-
-    <script>
-        const customerForm = document.getElementById('customer-form');
-        const submitButton = document.getElementById('submit-button');
-        const formMessage = document.getElementById('form-message');
-
-        const fieldIds = [
-            'name',
-            'contact_number'
-        ];
-
-        function clearMessages() {
-            formMessage.textContent = '';
-            formMessage.className = 'form-message';
-
-            fieldIds.forEach(function (fieldId) {
-                const input = document.getElementById(fieldId);
-                const error = document.getElementById(fieldId + '-error');
-
-                input.removeAttribute('aria-invalid');
-                error.textContent = '';
-            });
-        }
-
-        function showMessage(type, message) {
-            formMessage.textContent = message;
-            formMessage.className = 'form-message ' + type;
-        }
-
-        function showFieldError(fieldId, message) {
+        fieldIds.forEach(function (fieldId) {
             const input = document.getElementById(fieldId);
             const error = document.getElementById(fieldId + '-error');
 
-            if (!input || !error || !fieldIds.includes(fieldId)) {
-                return false;
-            }
+            input.removeAttribute('aria-invalid');
+            error.textContent = '';
+        });
+    }
 
-            const label = document.querySelector('label[for="' + fieldId + '"]');
-            const fieldName = label
-                ? label.textContent.replace(/\s*\*$/, '').trim()
-                : 'This field';
-            const details = Array.isArray(message) ? message[0] : message;
+    function showMessage(type, message) {
+        formMessage.textContent = message;
+        formMessage.className = 'form-message ' + type;
+    }
 
-            input.setAttribute('aria-invalid', 'true');
-            error.textContent = fieldName + ': ' +
-                (typeof details === 'string' && details.trim()
-                    ? details
-                    : 'Please enter a valid value.');
-            return true;
+    function showFieldError(fieldId, message) {
+        const input = document.getElementById(fieldId);
+        const error = document.getElementById(fieldId + '-error');
+
+        if (!input || !error || !fieldIds.includes(fieldId)) {
+            return false;
         }
 
-        function showValidationErrors(result) {
-            let hasFieldErrors = false;
+        const label = document.querySelector('label[for="' + fieldId + '"]');
+        const fieldName = label
+            ? label.textContent.replace(/\s*\*$/, '').trim()
+            : 'This field';
+        const details = Array.isArray(message) ? message[0] : message;
 
-            if (result && typeof result.field === 'string') {
+        input.setAttribute('aria-invalid', 'true');
+        error.textContent = fieldName + ': ' +
+            (typeof details === 'string' && details.trim()
+                ? details
+                : 'Please enter a valid value.');
+        return true;
+    }
+
+    function showValidationErrors(result) {
+        let hasFieldErrors = false;
+
+        if (result && typeof result.field === 'string') {
+            hasFieldErrors = showFieldError(
+                result.field,
+                result.error
+            ) || hasFieldErrors;
+        }
+
+        if (result && result.errors &&
+            typeof result.errors === 'object' &&
+            !Array.isArray(result.errors)) {
+            Object.entries(result.errors).forEach(function (entry) {
                 hasFieldErrors = showFieldError(
-                    result.field,
-                    result.error
+                    entry[0],
+                    entry[1]
                 ) || hasFieldErrors;
-            }
-
-            if (result && result.errors &&
-                typeof result.errors === 'object' &&
-                !Array.isArray(result.errors)) {
-                Object.entries(result.errors).forEach(function (entry) {
-                    hasFieldErrors = showFieldError(
-                        entry[0],
-                        entry[1]
-                    ) || hasFieldErrors;
-                });
-            }
-
-            return hasFieldErrors;
+            });
         }
 
-        function handleInvalidInput(event) {
-            const input = event.target;
+        return hasFieldErrors;
+    }
 
-            if (!input || !fieldIds.includes(input.id)) {
-                return;
-            }
+    function handleInvalidInput(event) {
+        const input = event.target;
 
-            if (input === customerForm.querySelector(':invalid')) {
-                clearMessages();
-            }
-
-            let message = 'Please enter a valid value.';
-
-            if (input.validity.valueMissing) {
-                message = 'Please enter a value.';
-            } else if (input.id === 'contact_number' && (
-                input.validity.patternMismatch ||
-                input.validity.tooShort ||
-                input.validity.tooLong
-            )) {
-                message = 'Please enter an 11-digit number.';
-            }
-
-            showFieldError(input.id, message);
-            showMessage(
-                'error',
-                'Please correct the highlighted fields and try again.'
-            );
+        if (!input || !fieldIds.includes(input.id)) {
+            return;
         }
 
-        customerForm.addEventListener('invalid', handleInvalidInput, true);
-
-        customerForm.addEventListener('submit', async function (event) {
-            event.preventDefault();
-
-            if (submitButton.disabled) {
-                return;
-            }
-
+        if (input === customerForm.querySelector(':invalid')) {
             clearMessages();
+        }
 
-            submitButton.disabled = true;
-            submitButton.textContent = 'Saving...';
+        let message = 'Please enter a valid value.';
 
-            const data = {
-                name: document.getElementById('name').value.trim(),
-                contact_number: document
-                    .getElementById('contact_number')
-                    .value.trim()
-            };
+        if (input.validity.valueMissing) {
+            message = 'Please enter a value.';
+        } else if (input.id === 'contact_number' && (
+            input.validity.patternMismatch ||
+            input.validity.tooShort ||
+            input.validity.tooLong
+        )) {
+            message = 'Please enter an 11-digit number.';
+        }
 
-            try {
-                const response = await fetch('/api/customers', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
+        showFieldError(input.id, message);
+        showMessage(
+            'error',
+            'Please correct the highlighted fields and try again.'
+        );
+    }
 
-                const result = await response.json();
+    customerForm.addEventListener('invalid', handleInvalidInput, true);
 
-                if (response.status === 201) {
-                    showMessage(
-                        'success',
-                        'Customer created successfully.'
-                    );
+    customerForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-                    customerForm.reset();
-                } else if (response.status === 422) {
-                    const hasFieldErrors = showValidationErrors(result);
-                    showMessage(
-                        'error',
-                        hasFieldErrors
-                            ? 'Please correct the highlighted fields and try again.'
-                            : 'Please review the customer information and try again.'
-                    );
-                } else {
-                    showMessage(
-                        'error',
-                        'Unable to create the customer. Please try again later.'
-                    );
-                }
-            } catch (error) {
+        if (submitButton.disabled) {
+            return;
+        }
+
+        clearMessages();
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+
+        const data = {
+            name: document.getElementById('name').value.trim(),
+            contact_number: document
+                .getElementById('contact_number')
+                .value.trim()
+        };
+
+        try {
+            const response = await fetch('/api/customers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.status === 201) {
+                showMessage(
+                    'success',
+                    'Customer created successfully.'
+                );
+
+                customerForm.reset();
+            } else if (response.status === 422) {
+                const hasFieldErrors = showValidationErrors(result);
                 showMessage(
                     'error',
-                    'Unable to reach the server. Please check your connection and try again.'
+                    hasFieldErrors
+                        ? 'Please correct the highlighted fields and try again.'
+                        : 'Please review the customer information and try again.'
                 );
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Save Customer';
+            } else {
+                showMessage(
+                    'error',
+                    'Unable to create the customer. Please try again later.'
+                );
             }
-        });
-    </script>
-</body>
-</html>
+        } catch (error) {
+            showMessage(
+                'error',
+                'Unable to reach the server. Please check your connection and try again.'
+            );
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Save Customer';
+        }
+    });
+</script>
+@endsection
